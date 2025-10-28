@@ -981,33 +981,39 @@ function adminLogin(){
   }
 }
 
-async function loadFromServer(){
-  try{
-    const res = await fetch(APP_EXEC_URL + '?action=get');
-    const data = await res.json();
-    if(Array.isArray(data)){
-      giaPha = data;
-      nextID = giaPha.length ? Math.max(...giaPha.map(p=>p.ID))+1 : 1;
-    }
-    save(); renderTree(); updateChaSelect(); capNhatDanhSachDoi(); capNhatDanhSachTen();
-    showMsg("✅ Đã tải dữ liệu từ server");
-  }catch(e){
-    console.error(e); showMsg("❌ Lỗi tải server");
+async function loadFromServer() {
+  try {
+    const response = await fetch(APP_EXEC_URL, {
+      method: "GET",
+      mode: "cors",
+    });
+
+    const result = await response.json();
+    alert("Tải thành công từ server!");
+    console.log(result);
+  } catch (err) {
+    alert("Không thể tải từ server!");
+    console.error(err);
   }
 }
 
-async function saveToServer(){
-  if(!canEdit) return alert("🔐 Hãy đăng nhập quản trị trước");
-  try{
-    const res = await fetch(APP_EXEC_URL,{
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({action:'save',password:'trv2025',data:giaPha})
+async function saveToServer(data) {
+  try {
+    const response = await fetch(APP_EXEC_URL, {
+      method: "POST",
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
     });
-    const j = await res.json();
-    console.log(j);
-    showMsg("📤 Đã lưu dữ liệu lên server");
-  }catch(e){
-    console.error(e); showMsg("❌ Lỗi lưu server");
+
+    const result = await response.json();
+    alert("Lưu thành công lên server!");
+    console.log(result);
+  } catch (err) {
+    alert("Không thể lưu lên server!");
+    console.error(err);
   }
 }
 
