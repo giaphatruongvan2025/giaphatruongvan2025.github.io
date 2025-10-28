@@ -1,0 +1,1036 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Gia phả — TRƯƠNG VĂN - HIỀN LƯƠNG - AN HỘI (FINAL)</title>
+
+<!-- Google Font for nicer header -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700;900&family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#fbf6f2;
+  --panel:#ffffff;
+  --accent:#8b0000; /* deep red */
+  --accent-2:#a83232;
+  --muted:#6b7280;
+  --line:#cfc6c2;
+  --strong-red:#b30000;
+  --gold:#FFD700;
+  --card:#fff7f5;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{font-family:Inter, Arial, sans-serif;background:var(--bg);margin:12px;color:#222;font-size:15px;line-height:1.35}
+h1,h2,h3,h4{margin:6px 0}
+
+/* Header style - Variant B (decorative) */
+.header-main{
+  text-align:center;
+  padding:10px 14px;
+  border-radius:12px;
+  background:linear-gradient(90deg,var(--accent),var(--accent-2));
+  color:var(--gold);
+  box-shadow:0 6px 18px rgba(0,0,0,0.12);
+  border:4px solid rgba(255,215,0,0.08);
+  position:relative;
+  overflow:hidden;
+}
+.header-decor{
+  position:absolute;
+  right:-40px;
+  top:-36px;
+  width:200px;
+  height:200px;
+  background: radial-gradient(circle at 30% 30%, rgba(255,215,0,0.06), rgba(255,255,255,0));
+  transform: rotate(28deg);
+  opacity:0.6;
+}
+.header-title{font-family:'Noto Serif TC', serif;font-size:22px;font-weight:900;letter-spacing:1px}
+.header-sub{
+  text-align:center;
+  font-family:'Noto Serif TC', serif;
+  color:var(--gold); 
+  font-size:36px;
+  margin-top:6px;
+  text-shadow:0 1px 0 rgba(0,0,0,0.25);
+  font-weight:800;
+  line-height:1;
+}
+
+/* ====== layout (BLOCK: layout) ====== */
+.layout-main { display:flex; flex-direction:column; gap:12px; margin-top:12px; }
+.row-top, .row-bottom { display:flex; gap:12px; align-items:flex-start; }
+.row-top > div, .row-bottom > div { flex:1; min-width:0; }
+@media(max-width:1000px){ .row-top,.row-bottom{flex-direction:column} }
+
+.panel {
+  background:var(--panel);
+  border:1px solid #efe6e3;
+  border-radius:10px;
+  padding:12px;
+  box-shadow:0 4px 14px rgba(16,24,40,0.04);
+}
+
+/* tree area */
+.tree-area{ min-height:420px; overflow:auto; position:relative; padding:10px; background:linear-gradient(180deg,#fffaf7,#fff); border:1px solid #efe6e3 }
+
+/* node card */
+.node-card{position:absolute;display:flex;align-items:center;gap:10px;background:linear-gradient(180deg,#fff,#fff7f7);border-radius:10px;padding:10px;border:1px solid #e8d7d6;cursor:pointer;box-shadow:0 6px 16px rgba(16,24,40,0.06);transition:transform 160ms}
+.node-card:hover{transform:translateY(-6px)}
+.node-card img, .node-card video{width:48px;height:48px;border-radius:8px;object-fit:cover;border:1px solid #ddd}
+.node-title{font-weight:800;font-size:14px;color:var(--accent)}
+.node-sub{font-size:12px;color:var(--muted);margin-top:2px}
+
+/* controls, buttons */
+.btn{display:inline-block;background:var(--accent);color:var(--gold);padding:8px 12px;border-radius:8px;text-decoration:none;border:0;cursor:pointer;margin:2px;font-weight:700}
+.btn.secondary{background:#6b7280;color:#fff}
+.btn.small{padding:6px 8px;font-size:13px}
+
+/* small */
+.small{font-size:13px;color:#555}
+
+/* form labels & inputs */
+.form-row{display:flex;gap:10px;align-items:center;margin:8px 0}
+.form-label{width:130px;font-weight:700;color:#333}
+.form-input{flex:1}
+input[type="text"], input[type="number"], textarea, select{
+  width:100%; padding:9px 10px; border-radius:8px; border:1px solid #e5d6d6; font-size:15px; background:#fff;
+}
+textarea{min-height:70px; resize:vertical}
+label{display:block}
+
+/* vo-block (wife) */
+.vo-block{border:1px dashed #f0e6e6;padding:10px;border-radius:8px;margin-top:8px;background:#fff8f6;display:block}
+.vo-grid{display:grid;grid-template-columns: 1fr 1fr 1fr; gap:8px}
+.vo-grid .form-label{width:100px}
+
+/* con list */
+.con-item{display:flex;gap:8px;align-items:center;margin-top:6px}
+.con-input{flex:1;padding:8px;border-radius:6px;border:1px solid #e9d9d9;font-size:14px}
+
+/* right-panel specifics */
+.right-panel { display:flex; flex-direction:column; gap:10px; }
+
+/* map and news containers within right panel */
+#mapContainer{flex:2;border:1px solid #e9d2d0;border-radius:8px;overflow:hidden;min-height:240px}
+#newsContainer{flex:1;border:1px solid #e9d2d0;border-radius:8px;overflow:auto;background:#fff;min-height:120px;padding:6px}
+
+/* status toast */
+#statusArea{position:fixed;top:18px;right:18px;z-index:1200;display:none;padding:10px 14px;border-radius:8px;background:#fff;border:1px solid var(--accent);box-shadow:0 6px 18px rgba(0,0,0,0.12);color:var(--accent);font-weight:700;font-size:14px}
+
+/* detail name styling */
+.detail-name{color:var(--strong-red); font-weight:900; font-size:18px}
+.detail-field{font-size:14px;color:#222;margin:6px 0}
+
+/* detail layout for wife/children - vertical rows */
+.detail-person{border-radius:8px;padding:8px;margin-top:8px;background:linear-gradient(180deg,#fff,#fff7f7);border:1px solid #f1e0df}
+.detail-row{display:flex;gap:10px;margin:6px 0;align-items:flex-start}
+.detail-row .label{width:120px;font-weight:700;color:#444}
+.detail-row .value{flex:1;color:#333}
+
+/* news media */
+.news-media img, .news-media video{max-width:100%;height:auto;border-radius:6px;display:block}
+
+/* scrollbar */
+.tree-area::-webkit-scrollbar, #newsContainer::-webkit-scrollbar{width:8px}
+.tree-area::-webkit-scrollbar-thumb, #newsContainer::-webkit-scrollbar-thumb{background:#e0bfbf;border-radius:6px}
+</style>
+</head>
+<body>
+
+<!-- ====== HEADER (BLOCK: header) ====== -->
+<div class="header-main">
+  <div class="header-decor" aria-hidden="true"></div>
+  <div class="header-title">🌲 GIA PHẢ — TRƯƠNG VĂN - HIỀN LƯƠNG - AN HỘI 🌲</div>
+  <div class="header-sub">MẠNH CHI</div>
+  <div style="font-size:13px;color:#fff;margin-top:6px">Written by Trương Văn Thành — giaphatruongvan2025@gmail.com — 0982175887</div>
+</div>
+
+<!-- Drive buttons under header (visible after pass) -->
+<div style="display:flex; gap:6px; margin:10px; justify-content:center;" id="driveArea" aria-hidden="true">
+  <button id="driveLoginBtn" class="btn" onclick="initGoogleAuth()">🔵 Đăng nhập Google Drive</button>
+  <div id="driveButtons" style="display:none; gap:6px;">
+    <button class="btn" onclick="uploadToDrive()">📤 Lưu lên Drive</button>
+    <button class="btn secondary" onclick="restoreFromDrive()">📥 Khôi phục dữ liệu</button>
+  </div>
+</div>
+
+<!-- ====== STATUS TOAST (BLOCK: status) ====== -->
+<div id="statusArea" style="display:none"></div>
+
+<!-- ====== LAYOUT 2x2 (BLOCK: main layout) ====== -->
+<div class="layout-main">
+
+  <!-- TOP ROW: tree | detail -->
+  <div class="row-top">
+    <!-- LEFT: Tree area -->
+    <div class="panel tree-area" id="treeArea" aria-label="Cây gia phả">
+      <!-- SVG lines and nodes will be injected here -->
+    </div>
+
+    <!-- RIGHT: Detail panel -->
+    <div class="panel" id="detailPanel">
+      <h2>Chi tiết cá nhân</h2>
+      <div id="detailContent" class="profile-card"><div class="small">Chọn một người trên cây để xem chi tiết</div></div>
+    </div>
+  </div>
+
+  <!-- BOTTOM ROW: form | right-panel (map + news) -->
+  <div class="row-bottom">
+    <!-- LEFT: Form panel -->
+    <div class="panel" id="formPanel">
+      <h2>Thêm / Sửa / Xóa cá nhân</h2>
+
+      <div class="notice small">Ghi chú: Nhấp 1 người trên cây để nạp dữ liệu vào form. Dùng "Thêm" để tạo người mới.</div>
+
+      <!-- QUICK SEARCH (inserted) -->
+      <div style="margin:8px 0" class="small">
+        Tìm nhanh:
+        <select id="searchPhai"><option value="">Phái (tất cả)</option><option>BÁ</option><option>MẠNH</option><option>TRỌNG</option><option>QUÝ</option><option>THÚC</option></select>
+        <select id="searchDoi"><option value="">Đời (tất cả)</option></select>
+        <select id="searchTen"><option value="">Tên (chọn)</option></select>
+        <button class="btn" onclick="timNguoi()">Tìm</button>
+        <button class="btn secondary" onclick="renderTree()">Toàn bộ</button>
+      </div>
+
+      <form id="mainForm" onsubmit="event.preventDefault();">
+        <div class="form-row"><div class="form-label"><b>Trạng thái:</b></div><div class="form-input"><span id="formMode">Chưa chọn</span></div></div>
+
+        <div class="form-row"><div class="form-label">Phái</div><div class="form-input"><select id="F_Phai"><option value="">-- Chọn phái --</option><option>BÁ</option><option>MẠNH</option><option>TRỌNG</option><option>QUÝ</option><option>THÚC</option></select></div></div>
+
+        <div class="form-row"><div class="form-label">Ảnh / Video</div><div class="form-input"><input id="F_Anh" type="file" accept="image/*,video/mp4"></div></div>
+
+        <div class="form-row"><div class="form-label">Họ và tên</div><div class="form-input"><input id="F_HoTen" type="text" placeholder="Họ và tên đầy đủ"></div></div>
+        <div class="form-row"><div class="form-label">Thường gọi</div><div class="form-input"><input id="F_ThuongGoi" type="text"></div></div>
+        <div class="form-row"><div class="form-label">Ngày sinh</div><div class="form-input"><input id="F_NgaySinh" type="text"></div></div>
+        <div class="form-row"><div class="form-label">Ngày mất</div><div class="form-input"><input id="F_NgayMat" type="text"></div></div>
+        <div class="form-row"><div class="form-label">Kỵ</div><div class="form-input"><input id="F_NgayKy" type="text"></div></div>
+
+        <div class="form-row"><div class="form-label">Bậc học</div><div class="form-input"><input id="F_BacHoc" type="text"></div></div>
+        <div class="form-row"><div class="form-label">Chức tước</div><div class="form-input"><input id="F_ChucTuoc" type="text"></div></div>
+
+        <div class="form-row"><div class="form-label">Mộ táng</div><div class="form-input"><input id="F_MoTang" type="text" placeholder="Địa chỉ hoặc mô tả"></div></div>
+        <div class="form-row"><div class="form-label">Tọa độ map</div><div class="form-input"><input id="F_ToaDoMaps" type="text" placeholder="Link hoặc tọa độ (ví dụ: 10.123,106.123)"></div></div>
+
+        <div class="form-row"><div class="form-label">Sanh hạ</div><div class="form-input"><input id="F_SanhHa" type="text"></div></div>
+        <div class="form-row"><div class="form-label">Ghi chú</div><div class="form-input"><textarea id="F_GhiChu"></textarea></div></div>
+
+        <div class="form-row"><div class="form-label">Đời</div><div class="form-input"><input id="F_Doi" type="number" min="0" max="50" value="1"></div></div>
+        <div class="form-row"><div class="form-label">Cha</div><div class="form-input"><select id="F_ChaID"><option value="">Không có cha</option></select></div></div>
+
+        <h3 style="margin-top:12px">Vợ (tối đa 3)</h3>
+        <div id="VoFormContainer"></div>
+
+        <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <button type="button" id="btnAdd" class="btn" onclick="startAdd()">Thêm</button>
+          <button type="button" id="btnEdit" class="btn" onclick="startEdit()">Sửa</button>
+          <button type="button" id="btnDelete" class="btn secondary" onclick="confirmDelete()">Xóa</button>
+          <button type="button" id="btnSave" class="btn" onclick="saveCurrent()">Lưu</button>
+          <button type="button" id="btnAddVo" class="btn" onclick="addVo()">Thêm vợ</button>
+
+          <!-- JSON export/import -->
+          <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+            <input id="importFile" type="file" accept="application/json" style="display:none" onchange="handleImport(this.files)">
+            <button type="button" class="btn" onclick="exportJSON()">📤 Xuất JSON</button>
+            <button type="button" class="btn" onclick="document.getElementById('importFile').click()">📥 Nạp JSON</button>
+            <button type="button" class="btn secondary" onclick="clearAll()">Xóa toàn bộ</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- RIGHT: Map + News -->
+    <div class="panel right-panel" id="rightPanel">
+      <div id="mapContainer" style="min-height:240px;">
+        <div style="background:#fff7f3;padding:6px;font-weight:700;font-size:14px;">Google Map</div>
+        <iframe id="mainMapIframe" src="https://www.google.com/maps/embed?pb=!1m18" width="100%" height="100%" style="border:0;min-height:180px;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </div>
+
+      <div id="newsContainer">
+        <div style="background:#fff7f3;padding:6px;font-weight:700;font-size:14px;">Tin tức / Sự kiện</div>
+        <div style="padding:6px;">
+          <div id="newsArea" class="notice">Chưa có dữ liệu</div>
+          <div style="margin-top:8px;">
+            <input id="newsFile" type="file" accept="image/*,video/mp4"><button class="btn" onclick="loadNews()">Tải</button>
+            <button class="btn secondary" onclick="clearNews()">Xóa</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+/* ====== CONFIG / STORAGE KEY ====== */
+const STORAGE_KEY = 'giaPha_final_v5'; // giữ key để không mất dữ liệu cũ
+
+/* ====== UTILITIES ====== */
+function q(id){return document.getElementById(id);}
+function escapeHTML(s){ return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]); }
+
+/* ====== STATUS TOAST (BLOCK: ui) ====== */
+function showMsg(m){
+  const el = q('statusArea');
+  el.textContent = m;
+  el.style.display = 'block';
+  el.style.opacity = 0;
+  el.style.transform = 'translateY(-8px)';
+  setTimeout(()=>{ el.style.transition='all 220ms'; el.style.opacity=1; el.style.transform='translateY(0)'; },10);
+  setTimeout(()=>{ el.style.opacity=0; el.style.transform='translateY(-8px)'; setTimeout(()=>el.style.display='none',220); },3000);
+}
+
+/* ====== DATA LAYER (BLOCK: storage, load/save) ====== */
+let giaPha = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+let nextID = giaPha.length ? Math.max(...giaPha.map(p=>p.ID))+1 : 1;
+function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(giaPha)); }
+
+/* ====== PASSWORD & PERMISSIONS (BLOCK: auth) ====== */
+let PASSWORD = localStorage.getItem('giaPhaPass') || '123';
+// removed duplicate canEdit
+
+function setButtonsState(enabled){
+  document.querySelectorAll('.btn').forEach(b=>{
+    if(enabled){ b.classList.remove('disabled'); b.disabled = false; b.style.opacity = 1; b.style.pointerEvents='auto'}
+    else { b.classList.add('disabled'); b.disabled = true; b.style.opacity = 0.45; b.style.pointerEvents='none' }
+  });
+  document.querySelectorAll('input[type=file]').forEach(f=>{ f.disabled = !enabled; f.style.opacity = enabled?1:0.45 });
+}
+
+function askPasswordOnLoad(){
+  const p = prompt('Nhập mật khẩu chỉnh sửa (hoặc Cancel để vào chế độ chỉ xem):','');
+  if(p === null){ canEdit = false; setButtonsState(false); showMsg('Chế độ: Chỉ xem'); return; }
+  if(p === PASSWORD){ canEdit = true; setButtonsState(true); showMsg('Đã đăng nhập: có quyền chỉnh sửa'); addChangePassButton(); document.getElementById('driveArea').setAttribute('aria-hidden','false'); }
+  else { canEdit = false; setButtonsState(false); alert('Mật khẩu không đúng — chế độ chỉ xem'); }
+}
+function addChangePassButton(){
+  if(q('changePassBtn')) return;
+  const btn = document.createElement('button');
+  btn.id = 'changePassBtn';
+  btn.className = 'btn secondary';
+  btn.style.position = 'fixed';
+  btn.style.top = '14px';
+  btn.style.left = '14px';
+  btn.textContent = 'Đổi mật khẩu';
+  btn.onclick = changePassword;
+  document.body.appendChild(btn);
+}
+function changePassword(){
+  if(!canEdit) return alert('Chỉ người có quyền mới đổi mật khẩu');
+  const oldP = prompt('Mật khẩu cũ:');
+  if(oldP !== PASSWORD){ alert('Mật khẩu cũ không đúng'); return; }
+  const newP = prompt('Mật khẩu mới (ít nhất 4 ký tự):');
+  if(!newP || newP.length < 4) return alert('Mật khẩu mới không hợp lệ');
+  PASSWORD = newP;
+  localStorage.setItem('giaPhaPass', PASSWORD);
+  showMsg('Đã đổi mật khẩu thành công');
+}
+
+/* ====== RENDER / LAYOUT (BLOCK: tree layout & render) ====== */
+
+/* Build children map helper */
+function buildChildrenMap(){
+  const map = {};
+  giaPha.forEach(p=>{
+    const k = (p.ChaID != null && p.ChaID !== '') ? p.ChaID : null;
+    if(!map[k]) map[k] = [];
+    map[k].push(p);
+  });
+  return map;
+}
+
+/* Compute layout */
+function computeLayout(dataAll){
+  const children = buildChildrenMap();
+  const ids = new Set(dataAll.map(d=>d.ID));
+  const roots = dataAll.filter(p => !(p.ChaID && ids.has(p.ChaID)));
+  const nodeW = 220, nodeH = 74, hGap = 24, vGap = 100;
+  const widths = {};
+  function subtreeWidth(p){
+    const kids = (children[p.ID]||[]).filter(k=> ids.has(k.ID));
+    if(kids.length===0) return widths[p.ID]=nodeW;
+    let w=0;
+    for(const k of kids) w += subtreeWidth(k);
+    w += hGap*(kids.length-1);
+    widths[p.ID]=Math.max(nodeW,w);
+    return widths[p.ID];
+  }
+  roots.forEach(r=>subtreeWidth(r));
+  dataAll.forEach(p=>{ if(!widths[p.ID]) widths[p.ID]=nodeW; });
+
+  const positions = {};
+  let cursor=20;
+  function layoutSub(p,xStart,depth){
+    const w = widths[p.ID];
+    const xCenter = xStart + w/2;
+    const y = 20 + depth*(nodeH+vGap) + nodeH/2;
+    positions[p.ID] = {x:xCenter,y,depth};
+    const kids = (children[p.ID]||[]).filter(k=> ids.has(k.ID));
+    if(kids.length){
+      let cx = xStart;
+      for(const k of kids){
+        layoutSub(k,cx,depth+1);
+        cx += widths[k.ID] + hGap;
+      }
+    }
+  }
+  if(roots.length===0){
+    for(const p of dataAll){ layoutSub(p,cursor,0); cursor += widths[p.ID]+hGap; }
+  } else {
+    for(const r of roots){ layoutSub(r,cursor,0); cursor += widths[r.ID]+hGap; }
+    const positioned = new Set(Object.keys(positions).map(k=>parseInt(k)));
+    for(const p of dataAll) if(!positioned.has(p.ID)) { layoutSub(p,cursor,0); cursor += widths[p.ID]+hGap; }
+  }
+  return {positions,nodeW,nodeH};
+}
+
+/* Render tree */
+function renderTree(subset){
+  const area = q('treeArea');
+  area.innerHTML = '';
+  const svgNS = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(svgNS,'svg'); svg.classList.add('lines');
+  area.appendChild(svg);
+
+  const dataAll = subset || giaPha;
+  const {positions,nodeW,nodeH} = computeLayout(dataAll);
+
+  // set svg size
+  let maxX = 0, maxY = 0;
+  Object.values(positions).forEach(p => {
+    if(p.x + nodeW/2 > maxX) maxX = p.x + nodeW/2;
+    if(p.y + nodeH/2 > maxY) maxY = p.y + nodeH/2;
+  });
+  const padding = 120;
+  svg.setAttribute('width', Math.max(1200, maxX + padding));
+  svg.setAttribute('height', Math.max(800, maxY + padding));
+
+  // draw lines
+  const children = buildChildrenMap();
+  for(const p of dataAll){
+    const kids = (children[p.ID]||[]).filter(k=> dataAll.includes(k));
+    if(!positions[p.ID]) continue;
+    const px = positions[p.ID].x, py = positions[p.ID].y;
+    for(const c of kids){
+      if(!positions[c.ID]) continue;
+      const cx = positions[c.ID].x, cy = positions[c.ID].y;
+      const line = document.createElementNS(svgNS,'line');
+      line.setAttribute('x1', px);
+      line.setAttribute('y1', py + nodeH/2);
+      line.setAttribute('x2', cx);
+      line.setAttribute('y2', cy - nodeH/2);
+      line.setAttribute('stroke', 'var(--line)');
+      line.setAttribute('stroke-width', '1.2');
+      svg.appendChild(line);
+    }
+  }
+
+  // draw nodes
+  for(const p of dataAll){
+    const pos = positions[p.ID]; if(!pos) continue;
+    const card = document.createElement('div'); card.className='node-card';
+    card.style.left = (pos.x - nodeW/2) + 'px';
+    card.style.top = (pos.y - nodeH/2) + 'px';
+    card.style.width = nodeW + 'px';
+    card.style.height = nodeH + 'px';
+    card.dataset.id = p.ID;
+    let mediaHTML = '';
+    if(p.Anh){
+      try{
+        if(String(p.Anh).startsWith('data:video')){
+          mediaHTML = `<video muted playsinline loop style="width:48px;height:48px;border-radius:8px;object-fit:cover" src="${p.Anh}"></video>`;
+        } else if(String(p.Anh).startsWith('data:image')){
+          mediaHTML = `<img src="${p.Anh}" alt="avatar">`;
+        } else if(p.Anh.startsWith('http')){
+          // external url; try to guess type from extension
+          if(p.Anh.match(/\.(mp4)(\?.*)?$/i)){ mediaHTML = `<video muted playsinline loop style="width:48px;height:48px;border-radius:8px;object-fit:cover" src="${p.Anh}"></video>`; }
+          else mediaHTML = `<img src="${p.Anh}" alt="avatar">`;
+        } else {
+          mediaHTML = `<div style="width:48px;height:48px;border-radius:8px;background:#fff7f6;display:flex;align-items:center;justify-content:center;color:#999">?</div>`;
+        }
+      }catch(e){ mediaHTML = `<div style="width:48px;height:48px;border-radius:8px;background:#fff7f6;display:flex;align-items:center;justify-content:center;color:#999">?</div>`; }
+    } else {
+      mediaHTML = `<div style="width:48px;height:48px;border-radius:8px;background:#f8f4f3;display:flex;align-items:center;justify-content:center;color:#999">?</div>`;
+    }
+    card.innerHTML = `${mediaHTML}<div style="flex:1"><div class="node-title">${escapeHTML(p.HoTen || '(không tên)')}</div><div class="node-sub">${escapeHTML(p.NgaySinh || '')}</div></div>`;
+    card.onclick = ()=>{ loadPersonIntoForm(p.ID); showDetail(p.ID); };
+    area.appendChild(card);
+  }
+
+  updateChaSelect();
+  capNhatDanhSachDoi();
+  capNhatDanhSachTen();
+}
+
+/* ====== SEARCH PANEL HELPERS ====== */
+function capNhatDanhSachDoi(){
+  const doiSel = q('searchDoi');
+  if(!doiSel) return;
+  doiSel.innerHTML = '<option value="">Đời (tất cả)</option>';
+  const ds = [...new Set(giaPha.map(p=>p.Doi).filter(x=>typeof x !== 'undefined' && x !== null))].sort((a,b)=>a-b);
+  ds.forEach(d=> doiSel.innerHTML += `<option value="${d}">${d}</option>`);
+}
+function capNhatDanhSachTen(){
+  const phai = q('searchPhai') ? q('searchPhai').value : '';
+  const doi = q('searchDoi') ? q('searchDoi').value : '';
+  const tenSel = q('searchTen');
+  if(!tenSel) return;
+  tenSel.innerHTML = '<option value="">Tên (chọn)</option>';
+  let ds = giaPha.slice();
+  if(phai) ds = ds.filter(p=>p.Phai === phai);
+  if(doi) ds = ds.filter(p=>String(p.Doi) === String(doi));
+  ds.forEach(p=> tenSel.innerHTML += `<option value="${p.ID}">${escapeHTML(p.HoTen)}</option>`);
+}
+if(q('formPanel')){
+  q('formPanel').addEventListener('change', e=>{ if(e.target && (e.target.id==='searchPhai' || e.target.id==='searchDoi')) capNhatDanhSachTen(); });
+}
+
+/* ====== DETAIL PANEL (BLOCK: showDetail) ====== */
+function showDetail(id){
+  const p = giaPha.find(x=>x.ID === id);
+  if(!p) return;
+  const cha = giaPha.find(x=>x.ID === p.ChaID);
+  let html = '';
+  // avatar + name
+  if(p.Anh){
+    if(String(p.Anh).startsWith('data:video') || (typeof p.Anh === 'string' && p.Anh.match(/\.mp4(\?.*)?$/i)) ){
+      html += `<div style="text-align:center"><video controls src="${p.Anh}" style="width:220px;height:auto;border-radius:8px;max-height:260px;object-fit:cover;margin-bottom:10px"></video></div>`;
+    } else {
+      html += `<div style="text-align:center"><img src="${p.Anh}" style="width:140px;height:140px;border-radius:12px;object-fit:cover;margin-bottom:10px"></div>`;
+    }
+  }
+  html += `<div style="text-align:center" class="detail-name">${escapeHTML(p.HoTen || '(không tên)')}</div>`;
+  html += `<div style="font-size:13px;line-height:1.45;margin-top:8px">`;
+  function line(lbl,val){ if(!val) return ''; return `<div class="detail-row"><div class="label">${lbl}</div><div class="value">${escapeHTML(val)}</div></div>`; }
+  html += line("Chi",p.Phai);
+  html += line("Cha mẹ",cha?cha.HoTen:'');
+  html += line("Thường gọi",p.ThuongGoi);
+  html += line("Sinh",p.NgaySinh);
+  html += line("Mất",p.NgayMat);
+  html += line("Kỵ",p.NgayKy);
+  html += line("Bậc học",p.BacHoc);
+  html += line("Chức tước",p.ChucTuoc);
+  // Mộ táng + nút Tìm mộ
+  html += `<div class="detail-row"><div class="label">Mộ táng</div><div class="value">${escapeHTML(p.MoTang||'')} <button class="btn small" style="margin-left:8px;padding:6px 8px;font-size:13px;" onclick="findGrave(${p.ID})">🔍 Tìm mộ</button></div></div>`;
+  html += line("Sanh hạ",p.SanhHa);
+  html += line("Ghi chú",p.GhiChu);
+  html += `</div>`;
+
+  // Vợ & con (vertical card per spouse)
+  html += `<h4 style="margin-top:12px;color:var(--strong-red)">Vợ (Chồng) - Con</h4>`;
+  if(p.Vo && p.Vo.length){
+    p.Vo.forEach((v,i)=>{
+      html += `<div class="detail-person"><div style="font-weight:800;color:var(--strong-red);margin-bottom:6px">${escapeHTML(v.Ten||'(không tên)')}</div>`;
+      function vline(lbl, val){ if(!val) return ''; return `<div class="detail-row"><div class="label">${lbl}</div><div class="value">${escapeHTML(val)}</div></div>`; }
+      html += vline('Thường gọi', v.ThuongGoi);
+      html += vline('Nguyên quán', v.QueQuan);
+      html += vline('Sinh', v.NgaySinh);
+      html += vline('Mất', v.NgayMat);
+      html += vline('Kỵ', v.Ky);
+      html += vline('Mộ', v.MoTang);
+      html += vline('Map', v.ToaDoMaps);
+      if(v.Con && v.Con.length){
+        html += `<div style="margin-top:8px"><b>Con:</b><div style="margin-top:6px">`;
+        v.Con.forEach(c=>{
+          const childNode = (typeof c.ID !== 'undefined') ? giaPha.find(pp=>pp.ID === c.ID) : null;
+          html += `<div style="margin:6px 0">- ${(childNode ? `<span style="color:var(--strong-red)">${escapeHTML(childNode.HoTen)}</span>` : escapeHTML(c.Ten || '(không tên)'))}</div>`;
+        });
+        html += `</div></div>`;
+      }
+      html += `</div>`;
+    });
+  } else html += `<div class="small">Không có vợ (chồng)</div>`;
+
+  q('detailContent').innerHTML = html;
+}
+
+/* ====== FORM / CRUD (BLOCK: load into form, save, add, delete) ====== */
+let currentID = null; let editMode = false;
+
+function updateChaSelect(){
+  const sel = q('F_ChaID'); if(!sel) return;
+  const old = sel.value;
+  sel.innerHTML = '<option value="">Không có cha</option>';
+  giaPha.forEach(p => sel.innerHTML += `<option value="${p.ID}">${escapeHTML(p.HoTen || ('#'+p.ID))}</option>`);
+}
+
+/* Render wife form block */
+function renderVoForm(person){
+  const cont = q('VoFormContainer'); if(!cont) return;
+  cont.innerHTML = '';
+  if(!person.Vo) person.Vo = [];
+  person.Vo.forEach((v,vi)=>{
+    const block = document.createElement('div'); block.className='vo-block';
+    // grid of fields
+    const grid = document.createElement('div'); grid.className='vo-grid';
+    grid.innerHTML = `
+      <div><label class="form-label">Họ tên</label><input class="vo-name" data-vi="${vi}" value="${escapeHTML(v.Ten||'')}" /></div>
+      <div><label class="form-label">Thường gọi</label><input class="vo-thuonggoi" data-vi="${vi}" value="${escapeHTML(v.ThuongGoi||'')}" /></div>
+      <div><label class="form-label">Nguyên quán</label><input class="vo-quequan" data-vi="${vi}" value="${escapeHTML(v.QueQuan||'')}" /></div>
+      <div><label class="form-label">Sinh</label><input class="vo-ns" data-vi="${vi}" value="${escapeHTML(v.NgaySinh||'')}" /></div>
+      <div><label class="form-label">Mất</label><input class="vo-mat" data-vi="${vi}" value="${escapeHTML(v.NgayMat||'')}" /></div>
+      <div><label class="form-label">Kỵ</label><input class="vo-ky" data-vi="${vi}" value="${escapeHTML(v.Ky||'')}" /></div>
+      <div style="grid-column:1/2"><label class="form-label">Mộ táng</label><input class="vo-motang" data-vi="${vi}" value="${escapeHTML(v.MoTang||'')}" /></div>
+      <div style="grid-column:2/4"><label class="form-label">Tọa độ map (link)</label><input class="vo-map" data-vi="${vi}" value="${escapeHTML(v.ToaDoMaps||'')}" /></div>
+    `;
+    // actions
+    const actions = document.createElement('div'); actions.style.marginTop='8px';
+    const btnAddCon = document.createElement('button'); btnAddCon.type='button'; btnAddCon.className='btn'; btnAddCon.textContent='Thêm con'; btnAddCon.onclick = ()=> addConInput(vi);
+    const btnDelVo = document.createElement('button'); btnDelVo.type='button'; btnDelVo.className='btn secondary'; btnDelVo.textContent='Xóa vợ'; btnDelVo.onclick = ()=> deleteVoInline(vi);
+    actions.appendChild(btnAddCon); actions.appendChild(btnDelVo);
+
+    block.appendChild(grid);
+    block.appendChild(actions);
+
+    // child list container
+    const conList = document.createElement('div'); conList.id = 'conlist-'+vi; conList.style.marginTop='8px';
+    block.appendChild(conList);
+
+    cont.appendChild(block);
+
+    // wire up inputs to model (live)
+    grid.querySelectorAll('input').forEach(inp=>{
+      inp.addEventListener('input', e=>{
+        const idx = parseInt(e.target.dataset.vi);
+        const name = e.target.className.split(' ')[0]; // e.g., vo-name
+        const keyMap = { 'vo-name':'Ten', 'vo-thuonggoi':'ThuongGoi', 'vo-quequan':'QueQuan', 'vo-ns':'NgaySinh', 'vo-mat':'NgayMat', 'vo-ky':'Ky', 'vo-motang':'MoTang', 'vo-map':'ToaDoMaps' };
+        const key = keyMap[name] || null;
+        if(key){ person.Vo[idx][key] = e.target.value; save(); showDetail(person.ID); }
+      });
+    });
+
+    // render children inputs
+    conList.innerHTML = '';
+    if(v.Con && v.Con.length){
+      v.Con.forEach((c,ci)=>{
+        const row = document.createElement('div'); row.className='con-item';
+        const input = document.createElement('input'); input.type='text'; input.className='con-input'; input.style.flex='1';
+        if(typeof c.ID !== 'undefined'){ const ch = giaPha.find(pp=>pp.ID===c.ID); input.value = ch?ch.HoTen:(c.Ten||''); input.dataset.cid = c.ID; }
+        else input.value = c.Ten || '';
+        const del = document.createElement('button'); del.type='button'; del.className='btn secondary'; del.textContent='Xóa con';
+        del.onclick = ()=>{
+          if(!confirm('Xác nhận xóa con?')) return;
+          if(input.dataset.cid){
+            const idc = parseInt(input.dataset.cid);
+            giaPha = giaPha.filter(pp=>pp.ID !== idc);
+            giaPha.forEach(pp=>{ if(pp.Vo) pp.Vo.forEach(vv=>{ if(vv.Con) vv.Con = vv.Con.filter(cc=>cc.ID !== idc); }); });
+            save(); renderTree(); const pnew = giaPha.find(pp=>pp.ID===person.ID); if(pnew) renderVoForm(pnew); showDetail(person.ID);
+            return;
+          } else { person.Vo[vi].Con.splice(ci,1); save(); renderVoForm(person); showDetail(person.ID); }
+        };
+        input.addEventListener('input', ()=>{
+          if(input.dataset.cid){
+            const idc = parseInt(input.dataset.cid); const child = giaPha.find(pp=>pp.ID === idc);
+            if(child){ child.HoTen = input.value; save(); renderTree(); showDetail(person.ID); }
+          } else { person.Vo[vi].Con[ci].Ten = input.value; save(); }
+        });
+        row.appendChild(input); row.appendChild(del); conList.appendChild(row);
+      });
+    }
+  });
+}
+
+/* load person into form */
+function loadPersonIntoForm(id){
+  const p = giaPha.find(x=>x.ID === id); if(!p) return;
+  currentID = id; editMode = true;
+  q('formMode').textContent = 'Đang chỉnh sửa: ' + (p.HoTen || '(không tên)');
+  q('F_Phai').value = p.Phai || '';
+  q('F_HoTen').value = p.HoTen || '';
+  q('F_ThuongGoi').value = p.ThuongGoi || '';
+  q('F_NgaySinh').value = p.NgaySinh || '';
+  q('F_NgayMat').value = p.NgayMat || '';
+  q('F_NgayKy').value = p.NgayKy || '';
+  q('F_BacHoc').value = p.BacHoc || '';
+  q('F_ChucTuoc').value = p.ChucTuoc || '';
+  q('F_MoTang').value = p.MoTang || '';
+  q('F_ToaDoMaps').value = p.ToaDoMaps || '';
+  q('F_SanhHa').value = p.SanhHa || '';
+  q('F_GhiChu').value = p.GhiChu || '';
+  q('F_Doi').value = p.Doi || 1;
+  q('F_ChaID').value = p.ChaID || '';
+  renderVoForm(p);
+}
+
+/* Add wife */
+function addVo(){
+  if(!canEdit) return alert('Không có quyền chỉnh sửa');
+  if(currentID === null){
+    const newP = { ID: nextID++, HoTen:'', ThuongGoi:'', NgaySinh:'', NgayMat:'', NgayKy:'', BacHoc:'', ChucTuoc:'', MoTang:'', ToaDoMaps:'', SanhHa:'', GhiChu:'', Doi:1, ChaID:null, Vo:[], Phai:'', Anh:'' };
+    giaPha.push(newP); save(); renderTree(); currentID = newP.ID;
+  }
+  const p = giaPha.find(pp=>pp.ID===currentID);
+  if(!p.Vo) p.Vo = [];
+  if(p.Vo.length >= 3) return alert('Tối đa 3 vợ');
+  p.Vo.push({Ten:'',ThuongGoi:'',QueQuan:'',NgaySinh:'',NgayMat:'',Ky:'',MoTang:'',ToaDoMaps:'',Con:[]});
+  save(); renderVoForm(p); renderTree(); showDetail(currentID);
+}
+
+/* add child input to wife block */
+function addConInput(voIndex){
+  if(currentID === null) return alert('Chọn người trên cây hoặc Lưu người mới trước khi thêm con');
+  const p = giaPha.find(pp=>pp.ID===currentID); if(!p) return;
+  if(!p.Vo || !p.Vo[voIndex]) return alert('Vợ không tồn tại');
+  if(!p.Vo[voIndex].Con) p.Vo[voIndex].Con = [];
+  p.Vo[voIndex].Con.push({Ten:''});
+  save(); renderVoForm(p); showDetail(currentID);
+}
+
+/* delete wife inline */
+function deleteVoInline(voIndex){
+  if(currentID === null) return alert('Chọn người trước');
+  const p = giaPha.find(pp=>pp.ID===currentID);
+  if(!p) return;
+  if(!confirm('Xác nhận xóa vợ này và các con liên quan?')) return;
+  const removed = p.Vo[voIndex].Con || [];
+  removed.forEach(c=>{
+    if(c.ID){
+      giaPha = giaPha.filter(pp=>pp.ID !== c.ID);
+      giaPha.forEach(pp=>{ if(pp.Vo) pp.Vo.forEach(vv=>{ if(vv.Con) vv.Con = vv.Con.filter(cc=>cc.ID !== c.ID); }); });
+    }
+  });
+  p.Vo.splice(voIndex,1);
+  save(); renderVoForm(p); renderTree(); showDetail(currentID);
+}
+
+/* ====== startAdd / startEdit / saveCurrent / delete (BLOCK: CRUD) ====== */
+
+/* startAdd (Thêm) auto-save previous then create new */
+async function startAdd(){
+  if(!canEdit) { alert('Không có quyền chỉnh sửa'); return; }
+  try{
+    const form = q('mainForm');
+    const inputs = form.querySelectorAll('input[type=text], input[type=number], textarea, select');
+    let hasData = false;
+    inputs.forEach(i=>{ if(i.type==='number'){ if(i.value && i.value!=='0') hasData=true } else if(i.value && i.value.trim()!=='') hasData=true; });
+    if(editMode || hasData) { await saveCurrent(); showMsg('✅ Đã lưu người trước'); }
+  }catch(e){ console.error(e); }
+
+  const newP = { ID: nextID++, HoTen:'', ThuongGoi:'', NgaySinh:'', NgayMat:'', NgayKy:'', BacHoc:'', ChucTuoc:'', MoTang:'', ToaDoMaps:'', SanhHa:'', GhiChu:'', Doi:1, ChaID:null, Vo:[], Phai:'', Anh:'' };
+  giaPha.push(newP);
+  currentID = newP.ID; editMode = true;
+  q('formMode').textContent = 'Đang thêm người mới';
+  q('mainForm').reset(); q('VoFormContainer').innerHTML = '';
+  save(); renderTree(); updateChaSelect(); showDetail(currentID);
+  showMsg('✅ Đã lưu người trước và tạo người mới.');
+}
+
+/* startEdit */
+function startEdit(){
+  if(currentID === null) return alert('Nhấp vào một người trên cây để nạp dữ liệu (hoặc Thêm để tạo người)');
+  editMode = true;
+  q('formMode').textContent = 'Chế độ sửa';
+  showMsg('Bạn đang ở chế độ sửa — chỉnh form rồi bấm Lưu');
+}
+
+/* read file helper */
+async function readFileAsDataURL(file){
+  return new Promise((resolve,reject)=>{ const fr = new FileReader(); fr.onload = e=>resolve(e.target.result); fr.onerror = e=>reject(e); fr.readAsDataURL(file); });
+}
+
+/* saveCurrent: create new if currentID null, else update */
+async function saveCurrent(){
+  if(!canEdit) return alert('Không có quyền lưu');
+  const fileInput = q('F_Anh');
+  const hasFile = fileInput && fileInput.files && fileInput.files[0];
+  const data = {
+    Phai: q('F_Phai').value || '',
+    HoTen: q('F_HoTen').value.trim(),
+    ThuongGoi: q('F_ThuongGoi').value.trim(),
+    NgaySinh: q('F_NgaySinh').value.trim(),
+    NgayMat: q('F_NgayMat').value.trim(),
+    NgayKy: q('F_NgayKy').value.trim(),
+    BacHoc: q('F_BacHoc').value.trim(),
+    ChucTuoc: q('F_ChucTuoc').value.trim(),
+    MoTang: q('F_MoTang').value.trim(),
+    ToaDoMaps: q('F_ToaDoMaps').value.trim(),
+    SanhHa: q('F_SanhHa').value.trim(),
+    GhiChu: q('F_GhiChu').value.trim(),
+    Doi: parseInt(q('F_Doi').value) || 1,
+    ChaID: q('F_ChaID').value ? parseInt(q('F_ChaID').value) : null
+  };
+
+  if(currentID === null){
+    const p = { ID: nextID++, HoTen:'', ThuongGoi:'', NgaySinh:'', NgayMat:'', NgayKy:'', BacHoc:'', ChucTuoc:'', MoTang:'', ToaDoMaps:'', SanhHa:'', GhiChu:'', Doi:1, ChaID:null, Vo:[], Phai:'', Anh:'' };
+    Object.assign(p, data);
+    if(hasFile){
+      try{ p.Anh = await readFileAsDataURL(fileInput.files[0]); }catch(err){ console.error('Ảnh/Video không đọc được',err); }
+    }
+    // read VoFormContainer children to create child entries if typed
+    const vb = q('VoFormContainer').children;
+    for(let vi=0; vi<vb.length; vi++){
+      const vblock = vb[vi];
+      const name = vblock.querySelector('.vo-name') ? vblock.querySelector('.vo-name').value.trim() : '';
+      const thuong = vblock.querySelector('.vo-thuonggoi') ? vblock.querySelector('.vo-thuonggoi').value.trim() : '';
+      const quequan = vblock.querySelector('.vo-quequan') ? vblock.querySelector('.vo-quequan').value.trim() : '';
+      const ns = vblock.querySelector('.vo-ns') ? vblock.querySelector('.vo-ns').value.trim() : '';
+      const mat = vblock.querySelector('.vo-mat') ? vblock.querySelector('.vo-mat').value.trim() : '';
+      const ky = vblock.querySelector('.vo-ky') ? vblock.querySelector('.vo-ky').value.trim() : '';
+      const motang = vblock.querySelector('.vo-motang') ? vblock.querySelector('.vo-motang').value.trim() : '';
+      const mapl = vblock.querySelector('.vo-map') ? vblock.querySelector('.vo-map').value.trim() : '';
+      const conInputs = vblock.querySelectorAll('.con-input');
+      const conRefs = [];
+      for(let ci=0; ci<conInputs.length; ci++){
+        const txt = conInputs[ci].value.trim();
+        if(!txt) continue;
+        const child = { ID: nextID++, HoTen: txt, ThuongGoi:'', NgaySinh:'', NgayMat:'', NgayKy:'', BacHoc:'', ChucTuoc:'', MoTang:'', ToaDoMaps:'', SanhHa:'', GhiChu:'', Doi: p.Doi+1, ChaID: p.ID, Vo:[], Phai:'', Anh:'' };
+        giaPha.push(child);
+        conRefs.push({ID: child.ID});
+      }
+      p.Vo.push({Ten: name, ThuongGoi:thuong, QueQuan:quequan, NgaySinh:ns, NgayMat:mat, Ky:ky, MoTang:motang, ToaDoMaps:mapl, Con:conRefs});
+    }
+    giaPha.push(p);
+    currentID = p.ID;
+    save(); renderTree(); renderVoForm(p); showDetail(currentID); updateChaSelect();
+    if(hasFile) q('F_Anh').value = '';
+    showMsg('Đã thêm người mới');
+    return;
+  }
+
+  // update existing
+  const p = giaPha.find(pp=>pp.ID === currentID);
+  if(!p) return alert('Người không tồn tại');
+  if(hasFile){
+    try{ p.Anh = await readFileAsDataURL(fileInput.files[0]); q('F_Anh').value = ''; }catch(err){ console.error('Ảnh/Video không đọc được',err); }
+  }
+  // assign
+  Object.assign(p, {
+    Phai:data.Phai, HoTen:data.HoTen, ThuongGoi:data.ThuongGoi, NgaySinh:data.NgaySinh, NgayMat:data.NgayMat,
+    NgayKy:data.NgayKy, BacHoc:data.BacHoc, ChucTuoc:data.ChucTuoc, MoTang:data.MoTang, ToaDoMaps:data.ToaDoMaps,
+    SanhHa:data.SanhHa, GhiChu:data.GhiChu, Doi:data.Doi, ChaID:data.ChaID
+  });
+
+  // rebuild Vo from DOM
+  const vb = q('VoFormContainer').children;
+  const newVo = [];
+  for(let vi=0; vi<vb.length; vi++){
+    const vblock = vb[vi];
+    const name = vblock.querySelector('.vo-name') ? vblock.querySelector('.vo-name').value.trim() : '';
+    const thuong = vblock.querySelector('.vo-thuonggoi') ? vblock.querySelector('.vo-thuonggoi').value.trim() : '';
+    const quequan = vblock.querySelector('.vo-quequan') ? vblock.querySelector('.vo-quequan').value.trim() : '';
+    const ns = vblock.querySelector('.vo-ns') ? vblock.querySelector('.vo-ns').value.trim() : '';
+    const mat = vblock.querySelector('.vo-mat') ? vblock.querySelector('.vo-mat').value.trim() : '';
+    const ky = vblock.querySelector('.vo-ky') ? vblock.querySelector('.vo-ky').value.trim() : '';
+    const motang = vblock.querySelector('.vo-motang') ? vblock.querySelector('.vo-motang').value.trim() : '';
+    const mapl = vblock.querySelector('.vo-map') ? vblock.querySelector('.vo-map').value.trim() : '';
+    const conInputs = vblock.querySelectorAll('.con-input');
+    const conRefs = [];
+    for(let ci=0; ci<conInputs.length; ci++){
+      const el = conInputs[ci];
+      const txt = el.value.trim();
+      const linked = el.dataset.cid ? parseInt(el.dataset.cid) : null;
+      if(linked){
+        const child = giaPha.find(pp=>pp.ID === linked);
+        if(child){ child.HoTen = txt; child.ChaID = currentID; }
+        conRefs.push({ID: linked});
+      } else {
+        if(txt){
+          const child = { ID: nextID++, HoTen: txt, ThuongGoi:'', NgaySinh:'', NgayMat:'', NgayKy:'', BacHoc:'', ChucTuoc:'', MoTang:'', ToaDoMaps:'', SanhHa:'', GhiChu:'', Doi: p.Doi+1, ChaID: currentID, Vo:[], Phai:'', Anh:'' };
+          giaPha.push(child);
+          conRefs.push({ID: child.ID});
+        }
+      }
+    }
+    newVo.push({ Ten: name, ThuongGoi:thuong, QueQuan:quequan, NgaySinh:ns, NgayMat:mat, Ky:ky, MoTang:motang, ToaDoMaps:mapl, Con: conRefs });
+  }
+  p.Vo = newVo;
+
+  save(); renderTree(); renderVoForm(p); showDetail(currentID); updateChaSelect();
+  showMsg('Đã lưu thay đổi');
+}
+
+/* confirmDelete */
+function confirmDelete(){
+  if(!canEdit) return alert('Không có quyền xóa');
+  if(currentID === null) return alert('Chọn người trên cây để xóa');
+  if(!confirm('Xác nhận xóa người này và (nếu có) các con được liên kết?')) return;
+  const p = giaPha.find(pp=>pp.ID===currentID);
+  if(!p) return;
+  if(p.Vo) p.Vo.forEach(v => { if(v.Con) v.Con.forEach(c => { if(c.ID){ giaPha = giaPha.filter(pp=>pp.ID !== c.ID); } }); });
+  giaPha = giaPha.filter(pp=>pp.ID !== currentID);
+  giaPha.forEach(pp=>{ if(pp.Vo) pp.Vo.forEach(vv=>{ if(vv.Con) vv.Con = vv.Con.filter(cc=>cc.ID !== currentID); }); });
+  save();
+  currentID = null; q('mainForm').reset(); q('VoFormContainer').innerHTML = ''; q('formMode').textContent='Chưa chọn';
+  renderTree(); q('detailContent').innerHTML = '<div class="small">Chọn một người trên cây để xem chi tiết</div>'; updateChaSelect();
+  showMsg('Đã xóa');
+}
+
+/* ====== JSON import/export & clear (BLOCK: data tools) ====== */
+function exportJSON(){
+  const data = JSON.stringify(giaPha, null, 2);
+  const blob = new Blob([data], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'giaPha_data.json'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+function handleImport(files){
+  if(!files || !files[0]) return alert('Chọn file JSON trước');
+  importJSONFile(files[0]);
+}
+
+function importJSONFile(file){
+  if(!file) return alert('Chọn file JSON trước');
+  const r = new FileReader();
+  r.onload = e => {
+    try{
+      const parsed = JSON.parse(e.target.result);
+      if(!Array.isArray(parsed)) throw new Error('Định dạng không hợp lệ');
+      giaPha = parsed; nextID = giaPha.length ? Math.max(...giaPha.map(p=>p.ID))+1 : 1;
+      save(); renderTree(); updateChaSelect(); q('mainForm').reset(); q('VoFormContainer').innerHTML=''; currentID=null;
+      capNhatDanhSachDoi(); capNhatDanhSachTen(); showMsg('Đã nạp dữ liệu');
+    }catch(err){ alert('File JSON không hợp lệ: '+err.message); }
+  };
+  r.readAsText(file);
+}
+
+function clearAll(){
+  if(!confirm('Xóa toàn bộ dữ liệu trong localStorage?')) return;
+  giaPha = []; nextID = 1; currentID = null; save(); renderTree(); updateChaSelect(); q('mainForm').reset(); q('VoFormContainer').innerHTML=''; q('detailContent').innerHTML = '<div class="small">Chọn một người trên cây để xem chi tiết</div>';
+  capNhatDanhSachDoi(); capNhatDanhSachTen(); showMsg('Dữ liệu đã xóa');
+}
+
+/* ====== FIND GRAVE (BLOCK: findGrave) ====== */
+function findGrave(personID){
+  const p = giaPha.find(x=>x.ID === personID);
+  if(!p){ showMsg('Không tìm thấy người này.'); return; }
+
+  // Ưu tiên Tọa độ map → fallback Mộ táng
+  let place = (p.ToaDoMaps && p.ToaDoMaps.trim()) ? p.ToaDoMaps.trim() : (p.MoTang || '').trim();
+  if(!place){ showMsg('Chưa có thông tin mộ để tìm.'); return; }
+
+  // If looks like coordinates "lat,lng"
+  const coordMatch = place.match(/^\s*([-+]?\d{1,3}(?:\.\d+)?),\s*([-+]?\d{1,3}(?:\.\d+)?)\s*$/);
+  let url = '';
+  if(coordMatch){
+    const lat = coordMatch[1], lng = coordMatch[2];
+    url = `https://www.google.com/maps?q=${encodeURIComponent(lat+','+lng)}&output=embed`;
+  } else if(place.startsWith('http')){
+    // If google maps short link (goo.gl or maps.app.goo.gl), open in new tab (can't reliably embed)
+    if(place.includes('maps.app.goo.gl') || place.includes('goo.gl/maps')){
+      window.open(place, '_blank');
+      showMsg('🔗 Mở vị trí mộ trong tab mới (link rút gọn).');
+      return;
+    }
+    // If contains '/maps/' or 'google.com', try to extract place or use q= fallback
+    try{
+      const u = new URL(place);
+      // If URL contains '/maps/' replace with embed pattern where possible
+      if(u.hostname.includes('google') && u.pathname.includes('/maps')){
+        // Try simple embed conversion by using q= with path+search
+        const fallbackTxt = u.pathname + (u.search || '');
+        url = 'https://www.google.com/maps?q=' + encodeURIComponent(fallbackTxt) + '&output=embed';
+      } else {
+        url = 'https://www.google.com/maps?q=' + encodeURIComponent(place) + '&output=embed';
+      }
+    }catch(e){
+      url = 'https://www.google.com/maps?q=' + encodeURIComponent(place) + '&output=embed';
+    }
+  } else {
+    // plain text address - use q=
+    url = 'https://www.google.com/maps?q=' + encodeURIComponent(place) + '&output=embed';
+  }
+
+  const iframe = q('mainMapIframe') || document.querySelector('#mapContainer iframe');
+  if(iframe){
+    iframe.src = url;
+    showMsg('📍 Đã chuyển bản đồ đến vị trí mộ.');
+    try{ q('mapContainer').scrollIntoView({behavior:'smooth'}); }catch(e){}
+  } else {
+    window.open(url,'_blank');
+  }
+}
+
+window.findGrave = findGrave;
+
+/* ====== NEWS (BLOCK: news load/clear) ====== */
+function loadNews(){
+  const f = q('newsFile').files[0];
+  if(!f) return alert('Chọn ảnh/clip trước');
+  const r = new FileReader();
+  r.onload = e => {
+    if(f.type.startsWith('image/')){
+      q('newsArea').innerHTML = `<div class="news-media"><div style="font-weight:700">${escapeHTML(f.name)}</div><img src="${e.target.result}" alt="${escapeHTML(f.name)}"></div>`;
+    } else if(f.type === 'video/mp4'){
+      q('newsArea').innerHTML = `<div class="news-media"><div style="font-weight:700">${escapeHTML(f.name)}</div><video controls src="${e.target.result}" style="max-width:100%;height:auto;border-radius:6px;margin-top:6px"></video></div>`;
+    } else {
+      q('newsArea').innerHTML = `<div>Đã tải file: ${escapeHTML(f.name)}</div>`;
+    }
+    showMsg('Đã tải tin tức');
+  };
+  if(f.type.startsWith('image/') || f.type === 'video/mp4') r.readAsDataURL(f);
+  else { q('newsArea').innerHTML = `<div>Đã tải file: ${escapeHTML(f.name)}</div>`; showMsg('Đã tải tin tức (file không phải ảnh/video)'); }
+}
+function clearNews(){ q('newsArea').innerHTML = '<div class="notice">Chưa có dữ liệu</div>'; showMsg('Đã xóa tin tức'); }
+
+
+/* ====== SERVER STORAGE VIA APPS SCRIPT ====== */
+let canEdit = false; // protected until admin logs in
+const APP_EXEC_URL = "https://script.google.com/macros/s/AKfycbwViuAwkYSe0sJ6xvvSaikF2CQUrhqw7Zzzb141RXindiqzKNi12zLO2Zrf0YPq3Hl87w/exec";
+
+function adminLogin(){
+  const pw = prompt("Nhập mật khẩu quản trị:");
+  if(pw === 'trv2025'){
+    canEdit = true;
+    showMsg("🔓 Quyền quản trị đã bật");
+  } else {
+    alert("⛔ Sai mật khẩu");
+  }
+}
+
+async function loadFromServer(){
+  try{
+    const res = await fetch(APP_EXEC_URL + '?action=get');
+    const data = await res.json();
+    if(Array.isArray(data)){
+      giaPha = data;
+      nextID = giaPha.length ? Math.max(...giaPha.map(p=>p.ID))+1 : 1;
+    }
+    save(); renderTree(); updateChaSelect(); capNhatDanhSachDoi(); capNhatDanhSachTen();
+    showMsg("✅ Đã tải dữ liệu từ server");
+  }catch(e){
+    console.error(e); showMsg("❌ Lỗi tải server");
+  }
+}
+
+async function saveToServer(){
+  if(!canEdit) return alert("🔐 Hãy đăng nhập quản trị trước");
+  try{
+    const res = await fetch(APP_EXEC_URL,{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'save',password:'trv2025',data:giaPha})
+    });
+    const j = await res.json();
+    console.log(j);
+    showMsg("📤 Đã lưu dữ liệu lên server");
+  }catch(e){
+    console.error(e); showMsg("❌ Lỗi lưu server");
+  }
+}
+
+function replaceDriveButtonsUI(){
+  const area = document.getElementById('driveArea');
+  if(!area) return;
+  area.innerHTML = '';
+  const mk = (txt, fn)=>{const b=document.createElement('button');b.className='btn';b.textContent=txt;b.onclick=fn;return b;};
+  area.appendChild(mk('🔑 Đăng nhập quản trị', adminLogin));
+  area.appendChild(mk('📥 Tải từ server', loadFromServer));
+  area.appendChild(mk('📤 Lưu lên server', saveToServer));
+  area.appendChild(mk('📤 Xuất JSON (local)', exportJSON));
+}
+/* ====== INIT (BLOCK: startup) ====== */
+window.addEventListener('load', ()=>{ replaceDriveButtonsUI(); loadFromServer();
+  renderTree();
+  updateChaSelect();
+  capNhatDanhSachDoi();
+  capNhatDanhSachTen();
+  setTimeout(askPasswordOnLoad, 60);
+  // drive buttons hidden until pass success
+});
+</script>
+
+</body>
+</html>
