@@ -288,7 +288,49 @@ let giaPha = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
 let nextID = giaPha.length ? Math.max(...giaPha.map(p=>p.ID))+1 : 1;
 function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(giaPha)); }
 
+/* ====== PASSWORD & PERMISSIONS (BLOCK: auth) ====== */
+let PASSWORD = localStorage.getItem('giaPhaPass') || '123';
+// removed duplicate canEdit
+
+function setButtonsState(enabled){
+  document.querySelectorAll('.btn').forEach(b=>{
+    if(enabled){ b.classList.remove('disabled'); b.disabled = false; b.style.opacity = 1; b.style.pointerEvents='auto'}
+    else { b.classList.add('disabled'); b.disabled = true; b.style.opacity = 0.45; b.style.pointerEvents='none' }
+  });
+  document.querySelectorAll('input[type=file]').forEach(f=>{ f.disabled = !enabled; f.style.opacity = enabled?1:0.45 });
+}
+
+function askPasswordOnLoad(){
+  const p = prompt('Nhập mật khẩu chỉnh sửa (hoặc Cancel để vào chế độ chỉ xem):','');
+  if(p === null){ canEdit = false; setButtonsState(false); showMsg('Chế độ: Chỉ xem'); return; }
+  if(p === PASSWORD){ canEdit = true; setButtonsState(true); showMsg('Đã đăng nhập: có quyền chỉnh sửa'); addChangePassButton(); document.getElementById('driveArea').setAttribute('aria-hidden','false'); }
+  else { canEdit = false; setButtonsState(false); alert('Mật khẩu không đúng — chế độ chỉ xem'); }
+}
+function addChangePassButton(){
+  if(q('changePassBtn')) return;
+  const btn = document.createElement('button');
+  btn.id = 'changePassBtn';
+  btn.className = 'btn secondary';
+  btn.style.position = 'fixed';
+  btn.style.top = '14px';
+  btn.style.left = '14px';
+  btn.textContent = 'Đổi mật khẩu';
+  btn.onclick = changePassword;
+  document.body.appendChild(btn);
+}
+function changePassword(){
+  if(!canEdit) return alert('Chỉ người có quyền mới đổi mật khẩu');
+  const oldP = prompt('Mật khẩu cũ:');
+  if(oldP !== PASSWORD){ alert('Mật khẩu cũ không đúng'); return; }
+  const newP = prompt('Mật khẩu mới (ít nhất 4 ký tự):');
+  if(!newP || newP.length < 4) return alert('Mật khẩu mới không hợp lệ');
+  PASSWORD = newP;
+  localStorage.setItem('giaPhaPass', PASSWORD);
+  showMsg('Đã đổi mật khẩu thành công');
+}
+
 /* ====== RENDER / LAYOUT (BLOCK: tree layout & render) ====== */
+
 /* Build children map helper */
 function buildChildrenMap(){
   const map = {};
@@ -932,160 +974,84 @@ function clearNews(){ q('newsArea').innerHTML = '<div class="notice">Chưa có d
 </div>
 
 <script>
-/* ====== GLOBAL VARIABLES ====== */
-let giaPha = [];
-let nextID = 1;
-let currentID = null;
-let canEdit = false;      // chỉ admin mới true
-let PASSWORD = localStorage.getItem('giaPhaPass') || '123';  // pass admin mặc định
-
+/* ====== FIREBASE STORAGE (SAVE/LOAD) ====== */
+let canEdit = false;
 const FIREBASE_URL = "https://giapha-truongvan-default-rtdb.firebaseio.com/giaPha_data.json";
 
-/* ====== HELPER ====== */
-function q(sel){ return document.querySelector(sel); }
-function showMsg(msg){ console.log(msg); }  // thay bằng hiển thị UI nếu muốn
-function escapeHTML(s){ return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-
-/* ====== BUTTON STATE ====== */
-function setButtonsState(enabled){
-  document.querySelectorAll('.btn').forEach(b=>{
-    b.disabled = !enabled;
-    b.style.opacity = enabled?1:0.45;
-    b.style.pointerEvents = enabled?'auto':'none';
-  });
-  document.querySelectorAll('input[type=file]').forEach(f=>{
-    f.disabled = !enabled;
-    f.style.opacity = enabled?1:0.45;
-  });
-}
-
-/* ====== PASSWORD & ADMIN ====== */
-function askPasswordOnLoad(){
-  const p = prompt('Nhập mật khẩu chỉnh sửa (hoặc Cancel để vào chế độ chỉ xem):','');
-  if(p === null){
-    canEdit = false;
-    setButtonsState(false);
-    showMsg('Chế độ: Chỉ xem');
-    return;
-  }
-  if(p === PASSWORD){
+function adminLogin(){
+  const pw = prompt("Nhập mật khẩu quản trị:");
+  if(pw === 'trv2025'){
     canEdit = true;
-    setButtonsState(true);
-    showMsg('Đã đăng nhập: có quyền chỉnh sửa');
-    addChangePassButton();
+    showMsg("🔓 Quyền quản trị đã bật");
   } else {
-    canEdit = false;
-    setButtonsState(false);
-    alert('Mật khẩu không đúng — chế độ chỉ xem');
+    alert("⛔ Sai mật khẩu");
   }
 }
 
-function addChangePassButton(){
-  if(q('#changePassBtn')) return;
-  const btn = document.createElement('button');
-  btn.id = 'changePassBtn';
-  btn.className = 'btn secondary';
-  btn.style.position = 'fixed';
-  btn.style.top = '14px';
-  btn.style.left = '14px';
-  btn.textContent = 'Đổi mật khẩu';
-  btn.onclick = changePassword;
-  document.body.appendChild(btn);
-}
-
-function changePassword(){
-  if(!canEdit) return alert('Chỉ Admin mới đổi được pass');
-  const oldP = prompt('Mật khẩu cũ:');
-  if(oldP !== PASSWORD){ alert('Sai mật khẩu cũ'); return; }
-  const newP = prompt('Mật khẩu mới (ít nhất 4 ký tự):');
-  if(!newP || newP.length <4) return alert('Mật khẩu mới không hợp lệ');
-  PASSWORD = newP;
-  localStorage.setItem('giaPhaPass', PASSWORD);
-  showMsg('Đổi mật khẩu thành công');
-}
-
-/* ====== FIREBASE ====== */
-async function loadFromServer(){
-  try{
+async function loadFromServer() {
+  try {
     const res = await fetch(FIREBASE_URL);
     const data = await res.json();
-    if(!data) throw new Error('Không có dữ liệu trên server.');
+    if (!data) throw new Error("Không có dữ liệu trên server.");
     giaPha = data;
     localStorage.setItem("giaPha_data", JSON.stringify(giaPha));
     renderTree();
-    showMsg("📥 Dữ liệu đã load từ Firebase");
-  }catch(err){ console.error(err); alert("❌ Không thể tải dữ liệu từ Firebase"); }
-}
-
-async function saveToServer(){
-  if(!canEdit){ alert("Bạn cần quyền Admin để lưu dữ liệu!"); return; }
-  try{
-    const res = await fetch(FIREBASE_URL, {
-      method:"PUT",
-      headers:{"Content-Type":"application/json"},
-      body: JSON.stringify(giaPha)
-    });
-    if(!res.ok) throw new Error("Firebase trả lỗi");
-    showMsg("📤 Dữ liệu đã lưu lên Firebase");
-  }catch(err){ console.error(err); alert("❌ Không thể lưu dữ liệu lên Firebase"); }
-}
-
-/* ====== LOCAL JSON ====== */
-function exportJSON(){
-  const data = JSON.stringify(giaPha,null,2);
-  const blob = new Blob([data],{type:'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href=url; a.download='giaPha_data.json'; a.click();
-  URL.revokeObjectURL(url);
-}
-
-function importJSON(files){
-  if(!files||!files[0]) return alert('Chọn file JSON trước');
-  const r = new FileReader();
-  r.onload = e=>{
-    try{
-      const parsed = JSON.parse(e.target.result);
-      if(!Array.isArray(parsed)) throw new Error('Định dạng không hợp lệ');
-      giaPha = parsed;
-      nextID = giaPha.length ? Math.max(...giaPha.map(p=>p.ID))+1 : 1;
-      saveToLocal(); renderTree(); updateChaSelect();
-      showMsg('📥 Đã nạp dữ liệu JSON');
-    }catch(err){ alert('JSON không hợp lệ: '+err.message); }
-  };
-  r.readAsText(files[0]);
-}
-
-function saveToLocal(){ localStorage.setItem("giaPha_data", JSON.stringify(giaPha)); }
-
-/* ====== DRIVE BUTTONS ====== */
-function replaceDriveButtonsUI(){
-  const area = document.getElementById('driveArea');
-  if(!area) return;
-  area.innerHTML='';
-  const mk=(txt,fn)=>{
-    const b=document.createElement('button'); b.className='btn'; b.textContent=txt; b.onclick=fn; return b;
-  };
-  area.appendChild(mk('📥 Tải từ Firebase', loadFromServer));
-  area.appendChild(mk('📤 Lưu lên Firebase', saveToServer));
-  area.appendChild(mk('📤 Xuất JSON', exportJSON));
-  area.appendChild(mk('📥 Nhập JSON', ()=>{ q('#importFile').click(); }));
-  // Ẩn input file
-  let f = q('#importFile');
-  if(!f){
-    f = document.createElement('input');
-    f.type='file'; f.id='importFile'; f.accept='.json'; f.style.display='none';
-    f.onchange = e=>importJSON(e.target.files);
-    document.body.appendChild(f);
+    showMsg("📥 Đã tải dữ liệu từ Firebase!");
+  } catch (err) {
+    console.error(err);
+    alert("❌ Không thể tải từ Firebase!");
   }
 }
 
-/* ====== INIT ON LOAD ====== */
-window.addEventListener('load', async ()=>{
-  await loadFromServer();      // load dữ liệu realtime
-  renderTree(); updateChaSelect(); capNhatDanhSachDoi(); capNhatDanhSachTen();
-  replaceDriveButtonsUI();      // tạo các nút
-  setButtonsState(false);       // mặc định disable
-  askPasswordOnLoad();           // prompt admin
+async function saveToServer() {
+  if (!canEdit) {
+    alert("Bạn cần đăng nhập quản trị để lưu lên server!");
+    return;
+  }
+  try {
+    const res = await fetch(FIREBASE_URL, {
+      method: "PUT",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(giaPha)
+    });
+    if (!res.ok) throw new Error("Firebase trả về lỗi.");
+    showMsg("📤 Đã lưu dữ liệu lên Firebase!");
+  } catch (err) {
+    console.error(err);
+    alert("❌ Không thể lưu lên Firebase!");
+  }
+}
+
+/* ====== FIREBASE BUTTONS ====== */
+function replaceDriveButtonsUI(){
+  const area = document.getElementById('driveArea');
+  if(!area) return;
+  area.innerHTML = '';
+  const mk = (txt, fn)=>{
+    const b=document.createElement('button');
+    b.className='btn';
+    b.textContent=txt;
+    b.onclick=fn;
+    return b;
+  };
+  area.appendChild(mk('🔑 Đăng nhập quản trị', adminLogin));
+  area.appendChild(mk('📥 Tải từ Firebase', loadFromServer));
+  area.appendChild(mk('📤 Lưu lên Firebase', saveToServer));
+  area.appendChild(mk('📤 Xuất JSON (local)', exportJSON));
+  area.appendChild(mk('📥 Nhập JSON (local)', importJSON));
+}
+
+/* ====== KHỞI TẠO ====== */
+window.addEventListener('load', ()=>{
+setTimeout(askPasswordOnLoad, 60);
+loadFromServer();  
+replaceDriveButtonsUI();
+  loadFromServer();
+  renderTree();
+  updateChaSelect();
+  capNhatDanhSachDoi();
+  capNhatDanhSachTen();
+  
 });
 </script>
 
