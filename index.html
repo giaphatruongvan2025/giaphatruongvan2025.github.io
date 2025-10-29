@@ -966,14 +966,26 @@ function loadNews(){
 }
 function clearNews(){ q('newsArea').innerHTML = '<div class="notice">Chưa có dữ liệu</div>'; showMsg('Đã xóa tin tức'); }
 
+<!-- ====== FIREBASE STORAGE (REPLACEMENT FOR APPS SCRIPT) ====== -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 
-/* ====== SERVER STORAGE VIA APPS SCRIPT ====== */
-let canEdit = false; // protected until admin logs in
-const APP_EXEC_URL = "https://script.google.com/macros/s/AKfycby_ySfpSma8maIVIhXhhxjyy3qmyVTBOfpzytN0aZmlpq0vIb0WUxo2IZW5rqmzVTEc/exec";
+/* ====== CẤU HÌNH FIREBASE ====== */
+const firebaseConfig = {
+  databaseURL: "https://giapha-truongvan-default-rtdb.firebaseio.com"
+};
 
+// Khởi tạo Firebase
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+let canEdit = false; // chỉ Admin mới được ghi
+
+/* ====== ĐĂNG NHẬP QUẢN TRỊ ====== */
 function adminLogin(){
   const pw = prompt("Nhập mật khẩu quản trị:");
-  if(pw === 'trv2025'){
+  if(pw === "trv2025"){
     canEdit = true;
     showMsg("🔓 Quyền quản trị đã bật");
   } else {
@@ -981,62 +993,68 @@ function adminLogin(){
   }
 }
 
-async function loadFromServer() {
+/* ====== TẢI DỮ LIỆU TỪ FIREBASE ====== */
+async function loadFromServer(){
   try {
-    const response = await fetch(APP_EXEC_URL, {
-      method: "GET",
-      mode: "cors",
-    });
-
-    const result = await response.json();
-    alert("Tải thành công từ server!");
-    console.log(result);
-  } catch (err) {
-    alert("Không thể tải từ server!");
-    console.error(err);
+    const snapshot = await get(ref(db, "giaPha_data"));
+    if(snapshot.exists()){
+      giaPha = snapshot.val(); // gán vào biến toàn cục
+      showMsg("📥 Đã tải dữ liệu từ Firebase!");
+      renderTree();
+      updateChaSelect();
+      capNhatDanhSachDoi();
+      capNhatDanhSachTen();
+    } else {
+      showMsg("⚠️ Firebase trống hoặc chưa có dữ liệu.");
+    }
+  } catch(err){
+    console.error("Lỗi load:", err);
+    alert("Không thể tải từ Firebase!");
   }
 }
 
-async function saveToServer(data) {
+/* ====== LƯU DỮ LIỆU LÊN FIREBASE ====== */
+async function saveToServer(){
+  if(!canEdit){ alert("Bạn không có quyền ghi dữ liệu!"); return; }
   try {
-    const response = await fetch(APP_EXEC_URL, {
-      method: "POST",
-      mode: "cors",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(data)
-    });
-
-    const result = await response.json();
-    alert("Lưu thành công lên server!");
-    console.log(result);
-  } catch (err) {
-    alert("Không thể lưu lên server!");
-    console.error(err);
+    await set(ref(db, "giaPha_data"), giaPha);
+    showMsg("📤 Đã lưu dữ liệu lên Firebase!");
+  } catch(err){
+    console.error("Lỗi save:", err);
+    alert("Không thể lưu lên Firebase!");
   }
 }
 
+/* ====== CẬP NHẬT NÚT GIAO DIỆN ====== */
 function replaceDriveButtonsUI(){
-  const area = document.getElementById('driveArea');
+  const area = document.getElementById("driveArea");
   if(!area) return;
-  area.innerHTML = '';
-  const mk = (txt, fn)=>{const b=document.createElement('button');b.className='btn';b.textContent=txt;b.onclick=fn;return b;};
-  area.appendChild(mk('🔑 Đăng nhập quản trị', adminLogin));
-  area.appendChild(mk('📥 Tải từ server', loadFromServer));
-  area.appendChild(mk('📤 Lưu lên server', saveToServer));
-  area.appendChild(mk('📤 Xuất JSON (local)', exportJSON));
+  area.innerHTML = "";
+  const mk = (txt, fn)=>{
+    const b = document.createElement("button");
+    b.className = "btn";
+    b.textContent = txt;
+    b.onclick = fn;
+    return b;
+  };
+  area.appendChild(mk("🔑 Đăng nhập quản trị", adminLogin));
+  area.appendChild(mk("📥 Tải từ Firebase", loadFromServer));
+  area.appendChild(mk("📤 Lưu lên Firebase", saveToServer));
+  area.appendChild(mk("📤 Xuất JSON (local)", exportJSON));
 }
-/* ====== INIT (BLOCK: startup) ====== */
-window.addEventListener('load', ()=>{ replaceDriveButtonsUI(); loadFromServer();
+
+/* ====== KHỞI ĐỘNG TRANG ====== */
+window.addEventListener("load", ()=>{
+  replaceDriveButtonsUI();
+  loadFromServer(); // tự động tải dữ liệu khi mở web
   renderTree();
   updateChaSelect();
   capNhatDanhSachDoi();
   capNhatDanhSachTen();
   setTimeout(askPasswordOnLoad, 60);
-  // drive buttons hidden until pass success
 });
 </script>
 
 </body>
 </html>
+
