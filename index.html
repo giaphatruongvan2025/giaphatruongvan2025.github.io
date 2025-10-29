@@ -965,7 +965,7 @@ function loadNews(){
   else { q('newsArea').innerHTML = `<div>Đã tải file: ${escapeHTML(f.name)}</div>`; showMsg('Đã tải tin tức (file không phải ảnh/video)'); }
 }
 function clearNews(){ q('newsArea').innerHTML = '<div class="notice">Chưa có dữ liệu</div>'; showMsg('Đã xóa tin tức'); }
-
+<script>
 <!-- ====== FIREBASE STORAGE (REPLACEMENT FOR APPS SCRIPT) ====== -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
