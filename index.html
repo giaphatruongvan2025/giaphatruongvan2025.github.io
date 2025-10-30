@@ -1025,9 +1025,19 @@ function clearNews(){ q('newsArea').innerHTML = '<div class="notice">Chưa có d
 </div>
 
 <script>
-/* ====== FIREBASE STORAGE (SAVE/LOAD) ====== */
+/* ====== FIREBASE CONFIG ====== */
 let canEdit = false;
 const FIREBASE_URL = "https://giapha-truongvan-default-rtdb.firebaseio.com/giaPha_data.json";
+const firebaseConfig = {
+  apiKey: "AIzaSyBxBCDs_f1SE6g3mHiMDkk-VbxJfn_Q0r0",
+  authDomain: "giapha-truongvan.firebaseapp.com",
+  databaseURL: "https://giapha-truongvan-default-rtdb.firebaseio.com",
+  projectId: "giapha-truongvan",
+  storageBucket: "giapha-truongvan.appspot.com",
+  messagingSenderId: "322268724419",
+  appId: "1:322268724419:web:9a314c6872fd713cd9b676",
+  measurementId: "G-PT4MQQ3V1W"
+};
 
 /* ====== ĐĂNG NHẬP QUẢN TRỊ ====== */
 function adminLogin(){
