@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="vi">
 <head>
@@ -186,14 +187,19 @@ label{display:block}
       <div class="notice small">Ghi chú: Nhấp 1 người trên cây để nạp dữ liệu vào form. Dùng "Thêm" để tạo người mới.</div>
 
       <!-- QUICK SEARCH (inserted) -->
-      <div style="margin:8px 0" class="small">
-        Tìm nhanh:
-        <select id="searchPhai"><option value="">Phái (tất cả)</option><option>BÁ</option><option>MẠNH</option><option>TRỌNG</option><option>QUÝ</option><option>THÚC</option></select>
-        <select id="searchDoi"><option value="">Đời (tất cả)</option></select>
-        <select id="searchTen"><option value="">Tên (chọn)</option></select>
-        <button class="btn" onclick="timNguoi()">Tìm</button>
-        <button class="btn secondary" onclick="renderTree()">Toàn bộ</button>
-      </div>
+      
+<div class="panel">
+    <h2>Tra cứu nhanh</h2>
+    <div class="search-bar" style="align-items:center">
+      <select id="searchPhai">
+        <option value="">Phái (tất cả)</option>
+        <option>BÁ</option><option>MẠNH</option><option>TRỌNG</option><option>QUÝ</option><option>THÚC</option>
+      </select>
+      <select id="searchDoi"><option value="">Đời (tất cả)</option></select>
+      <select id="searchTen"><option value="">Tên (chọn)</option></select>
+      <button id="btnSearch" class="btn" onclick="timNguoi()">Tìm kiếm</button>
+      <button class="btn secondary" onclick="renderTree()">Hiển thị toàn bộ</button>
+    </div>
 
       <form id="mainForm" onsubmit="event.preventDefault();">
         <div class="form-row"><div class="form-label"><b>Trạng thái:</b></div><div class="form-input"><span id="formMode">Chưa chọn</span></div></div>
@@ -294,11 +300,56 @@ let PASSWORD = localStorage.getItem('giaPhaPass') || '123';
 
 function setButtonsState(enabled){
   document.querySelectorAll('.btn').forEach(b=>{
-    if(enabled){ b.classList.remove('disabled'); b.disabled = false; b.style.opacity = 1; b.style.pointerEvents='auto'}
-    else { b.classList.add('disabled'); b.disabled = true; b.style.opacity = 0.45; b.style.pointerEvents='none' }
+    // Giữ nút [Tìm kiếm] luôn sáng và hoạt động
+    if(b.id === 'btnSearch'){ 
+      b.classList.remove('disabled'); 
+      b.disabled = false; 
+      b.style.opacity = '1 !important'; 
+      b.style.pointerEvents = 'auto'; 
+      b.style.filter = 'none';
+      return; 
+    }
+
+    // Các nút khác vẫn phụ thuộc quyền chỉnh sửa
+    if(enabled){ 
+      b.classList.remove('disabled'); 
+      b.disabled = false; 
+      b.style.opacity = 1; 
+      b.style.pointerEvents = 'auto'; 
+    } else { 
+      b.classList.add('disabled'); 
+      b.disabled = true; 
+      b.style.opacity = 0.45; 
+      b.style.pointerEvents = 'none'; 
+    }
   });
-  document.querySelectorAll('input[type=file]').forEach(f=>{ f.disabled = !enabled; f.style.opacity = enabled?1:0.45 });
+
+  document.querySelectorAll('input[type=file]').forEach(f=>{
+    f.disabled = !enabled; 
+    f.style.opacity = enabled ? 1 : 0.45;
+  });
 }
+
+// Luôn bật nút tìm kiếm cho mọi người sau khi load xong trang
+document.addEventListener('DOMContentLoaded', ()=>{
+  const s = document.getElementById('btnSearch');
+  if(s){
+    s.disabled = false;
+    s.classList.remove('disabled');
+    s.style.opacity = '1';
+    s.style.pointerEvents = 'auto';
+    s.style.filter = 'none';
+    s.removeAttribute('aria-disabled');
+  }
+});
+
+
+// Luôn bật nút tìm kiếm cho mọi người
+document.addEventListener('DOMContentLoaded', ()=>{
+  const s = document.getElementById('btnSearch');
+  if(s){ s.disabled = false; s.style.opacity = 1; s.style.pointerEvents = 'auto'; s.classList.remove('disabled'); }
+});
+
 
 function askPasswordOnLoad(){
   const p = prompt('Nhập mật khẩu chỉnh sửa (hoặc Cancel để vào chế độ chỉ xem):','');
@@ -1053,6 +1104,40 @@ replaceDriveButtonsUI();
   capNhatDanhSachTen();
   
 });
+// Search action: if a specific person chosen -> show 3 generations; if none -> show full
+function timNguoi(){
+  const id = q('searchTen').value;
+  if(!id){
+    renderTree(); // full
+    showMsg('Hiển thị toàn bộ cây');
+    return;
+  }
+  const pid = parseInt(id);
+  const p = giaPha.find(x=>x.ID === pid);
+  if(!p) return alert('Không tìm thấy người');
+  // find cha (if any) and direct children
+  const cha = giaPha.find(x=>x.ID === p.ChaID);
+  const con = giaPha.filter(x=>x.ChaID === p.ID);
+  const sub = [];
+  if(cha) sub.push(cha);
+  sub.push(p);
+  con.forEach(c=>sub.push(c));
+  renderTree(sub);
+  showDetail(pid);
+}
+
+// ------------------ TREE layout/render (modified to accept subset) ------------------
+// Build adjacency from ChaID relationships
+function buildChildrenMap(){
+  const map = {};
+  giaPha.forEach(p=>{
+    const k = (p.ChaID != null && p.ChaID !== '') ? p.ChaID : null;
+    if(!map[k]) map[k] = [];
+    map[k].push(p);
+  });
+  return map;
+}
+
 </script>
 
 </body>
