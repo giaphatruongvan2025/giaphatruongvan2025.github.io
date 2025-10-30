@@ -1029,19 +1029,22 @@ function clearNews(){ q('newsArea').innerHTML = '<div class="notice">Chưa có d
 let canEdit = false;
 const FIREBASE_URL = "https://giapha-truongvan-default-rtdb.firebaseio.com/giaPha_data.json";
 
+/* ====== ĐĂNG NHẬP QUẢN TRỊ ====== */
 function adminLogin(){
-  const pw = prompt("Nhập mật khẩu quản trị:");
-  if(pw === 'trv2025'){
+  const pw = prompt("🔐 Nhập mật khẩu quản trị:");
+  if(pw && pw.trim() === "trv2025"){
     canEdit = true;
-    showMsg("🔓 Quyền quản trị đã bật");
+    showMsg("✅ Đã bật quyền quản trị!");
   } else {
-    alert("⛔ Sai mật khẩu");
+    alert("⛔ Sai mật khẩu hoặc trống!");
   }
 }
 
+/* ====== TẢI DỮ LIỆU TỪ FIREBASE ====== */
 async function loadFromServer() {
   try {
-    const res = await fetch(FIREBASE_URL);
+    const res = await fetch(FIREBASE_URL + '?t=' + Date.now()); // tránh cache
+    if (!res.ok) throw new Error("Lỗi mạng hoặc Firebase không phản hồi");
     const data = await res.json();
     if (!data) throw new Error("Không có dữ liệu trên server.");
     giaPha = data;
@@ -1050,26 +1053,36 @@ async function loadFromServer() {
     showMsg("📥 Đã tải dữ liệu từ Firebase!");
   } catch (err) {
     console.error(err);
-    alert("❌ Không thể tải từ Firebase!");
+    alert("❌ Không thể tải từ Firebase!\n" + err.message);
   }
 }
 
+/* ====== LƯU DỮ LIỆU LÊN FIREBASE ====== */
 async function saveToServer() {
   if (!canEdit) {
-    alert("Bạn cần đăng nhập quản trị để lưu lên server!");
+    alert("⚠️ Bạn cần đăng nhập quản trị để lưu lên server!");
     return;
   }
+
+  if (!giaPha || giaPha.length === 0) {
+    alert("❌ Không có dữ liệu để lưu!");
+    return;
+  }
+
+  if (!confirm("Bạn có chắc muốn GHI ĐÈ dữ liệu trên Firebase không?")) return;
+
   try {
     const res = await fetch(FIREBASE_URL, {
       method: "PUT",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify(giaPha)
     });
-    if (!res.ok) throw new Error("Firebase trả về lỗi.");
-    showMsg("📤 Đã lưu dữ liệu lên Firebase!");
+
+    if (!res.ok) throw new Error("Firebase trả về lỗi HTTP " + res.status);
+    showMsg("📤 Đã lưu dữ liệu lên Firebase thành công!");
   } catch (err) {
     console.error(err);
-    alert("❌ Không thể lưu lên Firebase!");
+    alert("❌ Không thể lưu lên Firebase!\n" + err.message);
   }
 }
 
@@ -1078,13 +1091,21 @@ function replaceDriveButtonsUI(){
   const area = document.getElementById('driveArea');
   if(!area) return;
   area.innerHTML = '';
+
   const mk = (txt, fn)=>{
-    const b=document.createElement('button');
-    b.className='btn';
-    b.textContent=txt;
-    b.onclick=fn;
+    const b = document.createElement('button');
+    b.className = 'btn';
+    b.type = 'button';
+    b.textContent = txt;
+    b.onclick = (e)=>{
+      e.preventDefault();
+      e.stopPropagation();
+      fn();
+      return false;
+    };
     return b;
   };
+
   area.appendChild(mk('🔑 Đăng nhập quản trị', adminLogin));
   area.appendChild(mk('📥 Tải từ Firebase', loadFromServer));
   area.appendChild(mk('📤 Lưu lên Firebase', saveToServer));
@@ -1104,7 +1125,8 @@ replaceDriveButtonsUI();
   capNhatDanhSachTen();
   
 });
-// Search action: if a specific person chosen -> show 3 generations; if none -> show full
+
+/* ====== TÌM NGƯỜI ====== */
 function timNguoi(){
   const id = q('searchTen').value;
   if(!id){
@@ -1115,7 +1137,6 @@ function timNguoi(){
   const pid = parseInt(id);
   const p = giaPha.find(x=>x.ID === pid);
   if(!p) return alert('Không tìm thấy người');
-  // find cha (if any) and direct children
   const cha = giaPha.find(x=>x.ID === p.ChaID);
   const con = giaPha.filter(x=>x.ChaID === p.ID);
   const sub = [];
@@ -1126,8 +1147,7 @@ function timNguoi(){
   showDetail(pid);
 }
 
-// ------------------ TREE layout/render (modified to accept subset) ------------------
-// Build adjacency from ChaID relationships
+/* ====== TẠO CÂY QUAN HỆ ====== */
 function buildChildrenMap(){
   const map = {};
   giaPha.forEach(p=>{
@@ -1137,7 +1157,6 @@ function buildChildrenMap(){
   });
   return map;
 }
-
 </script>
 
 </body>
