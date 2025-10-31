@@ -1039,20 +1039,35 @@ function adminLogin(){
   }
 }
 
-async function loadFromServer() {
+
+
+
+// ====== Firebase Config (Storage + Database) ======
+const firebaseConfig = {
+  apiKey: "AIzaSyBxBCDs_f1SE6g3mHiMDkk-VbxJfn_Q0r0",
+  authDomain: "giapha-truongvan.firebaseapp.com",
+  databaseURL: "https://giapha-truongvan-default-rtdb.firebaseio.com",
+  projectId: "giapha-truongvan",
+  storageBucket: "giapha-truongvan.appspot.com",
+  messagingSenderId: "322268724419",
+  appId: "1:322268724419:web:9a314c6872fd713cd9b676",
+  measurementId: "G-PT4MQQ3V1W"
+};
+
+/* ====== KHỞI TẠO FIREBASE CHO STORAGE ====== */
+function initFirebaseStorage() {
   try {
-    const res = await fetch(FIREBASE_URL);
-    const data = await res.json();
-    if (!data) throw new Error("Không có dữ liệu trên server.");
-    giaPha = data;
-    localStorage.setItem("giaPha_data", JSON.stringify(giaPha));
-    renderTree();
-    showMsg("📥 Đã tải dữ liệu từ Firebase!");
-  } catch (err) {
-    console.error(err);
-    alert("❌ Không thể tải từ Firebase!");
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+      console.log("✅ Firebase Storage initialized");
+    }
+    window.storage = firebase.storage();
+  } catch (e) {
+    console.warn("⚠️ Firebase đã khởi tạo rồi");
   }
 }
+initFirebaseStorage();
+
 
 async function saveToServer() {
   if (!canEdit) {
@@ -1060,18 +1075,44 @@ async function saveToServer() {
     return;
   }
   try {
+    const payload = { giaPha, tinTuc }; // Gộp cả tinTuc vào
     const res = await fetch(FIREBASE_URL, {
       method: "PUT",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify(giaPha)
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
     });
     if (!res.ok) throw new Error("Firebase trả về lỗi.");
-    showMsg("📤 Đã lưu dữ liệu lên Firebase!");
+    showMsg("📤 Đã lưu dữ liệu (kèm ảnh/video) lên Firebase!");
   } catch (err) {
     console.error(err);
-    alert("❌ Không thể lưu lên Firebase!");
+    alert("❌ Không thể lưu lên Firebase! " + err.message);
   }
 }
+async function loadFromServer() {
+  try {
+    const res = await fetch(FIREBASE_URL + '?t=' + Date.now());
+    if (!res.ok) throw new Error("Firebase không phản hồi");
+    const data = await res.json();
+    if (!data) throw new Error("Không có dữ liệu trên server");
+
+    // Nếu server có cả giaPha và tinTuc
+    giaPha = data.giaPha || data;
+    tinTuc = data.tinTuc || [];
+
+    // Lưu local backup
+    localStorage.setItem("giaPha_data", JSON.stringify({ giaPha, tinTuc }));
+
+    showMsg("📥 Đã tải dữ liệu (có ảnh/video) từ Firebase!");
+    renderTree();
+    if (typeof renderTinTuc === "function") renderTinTuc();
+
+  } catch (err) {
+    console.error(err);
+    alert("❌ Không thể tải từ Firebase: " + err.message);
+  }
+}
+
+
 
 /* ====== FIREBASE BUTTONS ====== */
 function replaceDriveButtonsUI(){
@@ -1095,8 +1136,9 @@ function replaceDriveButtonsUI(){
 /* ====== KHỞI TẠO ====== */
 window.addEventListener('load', ()=>{
 setTimeout(askPasswordOnLoad, 60);
+loadFromServer();
 replaceDriveButtonsUI();
-  loadFromServer();
+  
   renderTree();
   updateChaSelect();
   capNhatDanhSachDoi();
@@ -1135,6 +1177,76 @@ function buildChildrenMap(){
     map[k].push(p);
   });
   return map;
+}
+
+
+/* ====== UPLOAD ẢNH / VIDEO (Firebase Storage) ====== */
+function setupFirebaseUpload(){
+  try {
+    firebase.initializeApp(firebaseConfig);
+  } catch(e) { /* ignore if already initialized */ }
+  const storage = firebase.storage();
+
+  // Tạo nút chọn file
+  const fileInput = document.createElement("input");
+  fileInput.type = "file";
+  fileInput.accept = "image/*,video/*";
+  fileInput.style.margin = "6px";
+
+  const uploadBtn = document.createElement("button");
+  uploadBtn.textContent = "⬆️ Upload ảnh / video";
+  uploadBtn.style.marginLeft = "6px";
+
+  uploadBtn.onclick = async () => {
+    if (!canEdit) {
+      alert("⚠️ Cần đăng nhập quản trị trước!");
+      return;
+    }
+    if (!fileInput.files.length) {
+      alert("❌ Chưa chọn file!");
+      return;
+    }
+
+    const file = fileInput.files[0];
+    const path = "uploads/" + Date.now() + "_" + file.name;
+    const ref = storage.ref(path);
+
+    showMsg("⏳ Đang upload file...");
+    try {
+      await ref.put(file);
+      const url = await ref.getDownloadURL();
+
+      // === GẮN URL VÀO FORM ĐANG NHẬP ===
+      const active = document.activeElement;
+      if (active && active.tagName === "INPUT") {
+        active.value = url;
+      }
+
+      // === Nếu là form tin tức / sự kiện ===
+      if (document.activeElement && document.activeElement.closest("#formTinTuc")) {
+        const form = document.querySelector("#formTinTuc");
+        const idx = parseInt(form.dataset.index || -1);
+        if (idx >= 0 && window.tinTuc && tinTuc[idx]) {
+          if (file.type.startsWith("image")) tinTuc[idx].Anh = url;
+          else if (file.type.startsWith("video")) tinTuc[idx].Video = url;
+          localStorage.setItem("giaPha_data", JSON.stringify({ giaPha, tinTuc }));
+          showMsg("✅ Đã lưu ảnh/video vào mục tin tức!");
+        }
+      }
+
+      showMsg("✅ Upload hoàn tất! Link đã được chèn vào form.");
+    } catch (err) {
+      console.error(err);
+      alert("❌ Upload thất bại: " + err.message);
+    }
+  };
+
+  const driveArea = document.getElementById("driveArea");
+  if (driveArea) {
+    driveArea.appendChild(document.createElement("br"));
+    driveArea.appendChild(fileInput);
+    driveArea.appendChild(uploadBtn);
+  }
 }
 
 </script>
