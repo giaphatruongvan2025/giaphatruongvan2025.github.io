@@ -261,3 +261,89 @@ html, body {
   font-size: .9rem;
   margin: 20px;
 }
+
+/* ================= RESPONSIVE MOBILE ================= */
+@media screen and (max-width: 768px) {
+
+  body {
+    font-size: 14px;
+  }
+
+  /* HEADER */
+  .title-main {
+    font-size: 1.4rem;
+  }
+  .title-chi {
+    font-size: 3.5rem;
+    margin-top: -5px;
+    margin-bottom: -5px;
+  }
+  .title-truong {
+    font-size: 1rem;
+  }
+  .btn-admin {
+    top: 10px;
+    right: 10px;
+    padding: 4px 8px;
+    font-size: 0.9rem;
+  }
+
+  /* TOOLBAR */
+  .toolbar {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px;
+  }
+  .toolbar select,
+  .toolbar button {
+    width: 100%;
+    font-size: 0.9rem;
+  }
+
+  /* MAIN ROW */
+  .main-row {
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px;
+  }
+  .tree-panel, .info-panel {
+    flex: 1 1 100%;
+    max-height: none;
+  }
+  .tree-panel svg {
+    height: 400px;
+  }
+
+  /* MEDIA */
+  .media-section {
+    flex-direction: column;
+    gap: 10px;
+    padding: 8px 10px;
+  }
+  .media-box {
+    flex: 1 1 100%;
+  }
+  .media-box iframe,
+  .media-box img {
+    height: auto;
+  }
+
+  /* MAP */
+  .map-section iframe {
+    height: 300px;
+  }
+
+  /* CHATBOX */
+  .chatbox {
+    width: 90%;
+    bottom: 10px;
+    right: 5%;
+  }
+
+  /* FOOTER */
+  .footer {
+    font-size: 0.8rem;
+    margin: 10px;
+  }
+}
