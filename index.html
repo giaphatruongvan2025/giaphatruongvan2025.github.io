@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gia Phả Trương Văn – MẠNH CHI – Showtime v3.4</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Charm:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="site-header">
+    <h1 class="title-main">GIA PHẢ TRƯƠNG VĂN – HIỀN LƯƠNG – AN HỘI</h1>
+    <div class="title-chi">孟  MẠNH   CHI    奇</div>
+    <div class="title-truong">Trưởng Họ : Trương Văn Mãn Đời thứ 12   -   Trưởng Chi Mạnh : Trương Văn Thiều   Đời thứ 12</div>
+    <button id="btnAdmin" class="btn-admin">⚙️ Admin</button>
+  </header>
+
+  <main class="main-container">
+    <!-- TOOLBAR -->
+    <section class="toolbar">
+      <label>Chi:</label><select id="chiSelect"></select>
+      <label>Đời:</label><select id="doiSelect"></select>
+      <label>Tên:</label><select id="tenSelect"></select>
+      <button id="searchBtn" class="btn-main">🔍 Tìm nhanh</button>
+      <button id="allBtn" class="btn-main">🌳 Toàn bộ</button>
+      <button id="zoomIn" class="btn-main">＋</button>
+      <button id="zoomOut" class="btn-main">－</button>
+    </section>
+
+    <!-- TREE + INFO -->
+    <section class="main-row">
+      <div class="tree-panel">
+        <div id="treeArea">
+          <svg id="genealogyTree" width="100%" height="700"></svg>
+        </div>
+      </div>
+
+      <div class="info-panel">
+        <div id="infoDetail" class="info-detail"><p>Chọn tên để xem thông tin chi tiết...</p></div>
+      </div>
+    </section>
+
+    <!-- MEDIA -->
+    <section class="media-section">
+      <div class="media-box">
+        <h3>Ảnh sự kiện</h3>
+        <img id="eventImageDisplay" src="" alt="Ảnh sự kiện" />
+      </div>
+      <div class="media-box">
+        <h3>Video YouTube</h3>
+        <iframe id="youtubeDisplay" frameborder="0" allowfullscreen></iframe>
+      </div>
+    </section>
+
+    <!-- MAP -->
+    <section class="map-section">
+      <h3>Bản đồ khu vực nghĩa trang An Hội</h3>
+      <iframe
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.3826110571766!2d106.69443731532269!3d10.779785262098409!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f463ed94fd1%3A0xfbf4184cbfd8ac47!2zQW4gSOG7jWkgU2F1IEhvcA!5e0!3m2!1svi!2s!4v1683269953098!5m2!1svi!2s"
+        allowfullscreen="" loading="lazy"></iframe>
+    </section>
+  </main>
+
+  <!-- CHATBOX -->
+  <div id="chatbox" class="chatbox">
+    <div class="chatbox-header">
+      <span>💬 Trợ lý Gia phả</span>
+      <button id="chatbox-toggle">⤢</button>
+    </div>
+    <div id="chatbox-body" class="chatbox-body"></div>
+    <div class="chatbox-footer">
+      <input type="text" id="chatInput" placeholder="Nhập tin nhắn...">
+      <button id="chatSend">Gửi</button>
+    </div>
+  </div>
+
+  <footer class="footer">
+    💠 Thiết kế bởi <strong>Trương Văn Thành</strong> – AI powered by ChatGPT
+  </footer>
+
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

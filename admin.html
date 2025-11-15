@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quản lý Gia Phả</title>
+  <link rel="stylesheet" href="css/admin.css" />
+</head>
+
+<body>
+  <header>
+    <h1>Quản lý gia phả</h1>
+    <button id="btnChangePass" class="btn btn-info">🔑 Đổi pass</button>
+  </header>
+
+  <main class="container">
+
+    <!-- DÒNG 1: ẢNH SỰ KIỆN + CLIP -->
+    <div class="media-row">
+      <div class="media-box">
+        <h3>Ảnh sự kiện</h3>
+        <input type="file" id="eventImageInput" accept="image/*" />
+        <img id="eventImagePreview" src="" alt="Preview ảnh" style="max-width:100%; margin-top:10px;" />
+        <button id="btnDeleteEventImage" class="btn btn-del">🗑 Xóa ảnh</button>
+      </div>
+
+      <div class="media-box">
+        <h3>Video YouTube</h3>
+        <input type="text" id="youtubeInput" placeholder="Dán link YouTube..." />
+        <iframe id="youtubePreview" width="100%" height="220" frameborder="0" allowfullscreen></iframe>
+        <button id="btnDeleteYoutube" class="btn btn-del">🗑 Xóa video</button>
+      </div>
+    </div>
+
+    <!-- DÒNG 2: THANH CÔNG CỤ -->
+    <div class="toolbar">
+      <button id="btnAdd" class="btn btn-add">➕ Thêm</button>
+      <button id="btnSave" class="btn btn-save">💾 Lưu</button>
+      <button id="btnDelete" class="btn btn-del">❌ Xóa</button>
+
+      <label>Chi:</label>
+      <select id="chiSelect"></select>
+
+      <label>Đời:</label>
+      <select id="doiSelect"></select>
+
+      <label>Tên:</label>
+      <select id="tenSelect"></select>
+
+      <button id="btnQuickSearch" class="btn btn-info">🔍 Tìm nhanh</button>
+    </div>
+
+    <!-- DÒNG 3: FORM CHÍNH -->
+    <form id="personForm">
+      <div class="form-section">
+        <h2>Thông tin cá nhân</h2>
+
+        <!-- ẢNH CÁ NHÂN -->
+        <div class="form-group">
+          <label>Ảnh cá nhân:</label>
+          <input type="file" id="personalImageInput" accept="image/*">
+        </div>
+
+        <div class="form-group">
+          <img id="personalImagePreview"
+               src=""
+               alt="Preview ảnh cá nhân"
+               style="max-width:10%; border-radius:8px; display:none;">
+        </div>
+
+        <div class="form-group"><label>Họ và tên:</label><input type="text" id="fullName"></div>
+        <div class="form-group"><label>Thường gọi:</label><input type="text" id="nickname"></div>
+
+        <div class="form-group">
+          <label>Chi:</label>
+          <select id="chiInput"></select>
+        </div>
+
+        <div class="form-group"><label>Đời:</label><input type="number" id="generation"></div>
+        <div class="form-group"><label>Cha:</label><select id="parentSelect"></select></div>
+        <div class="form-group"><label>Chức Nghiệp:</label><input type="text" id="job"></div>
+        <div class="form-group"><label>Sinh:</label><input type="text" id="birth"></div>
+        <div class="form-group"><label>Mất(kỵ):</label><input type="text" id="death"></div>
+        <div class="form-group"><label>Mộ táng:</label><input type="text" id="grave"></div>
+        <div class="form-group"><label>Vị trí maps:</label><input type="text" id="map"></div>
+	<div class="form-group"><label>Sanh hạ:</label><input type="text" id="ky"></div>
+        <div class="form-group"><label>Ghi chú:</label><textarea id="note"></textarea></div>
+
+        <!-- VỢ -->
+        <button type="button" id="btnAddWife" class="btn btn-add">➕ Thêm vợ</button>
+        <div id="wivesContainer"></div>
+
+      </div>
+    </form>
+
+    <!-- DÒNG 4: HÀNH ĐỘNG DƯỚI -->
+    <div class="footer-actions">
+      <button id="btnExport" class="btn btn-info">📤 Xuất JSON</button>
+      <button id="btnImport" class="btn btn-info">📥 Nạp JSON</button>
+      <button id="btnSaveLocal" class="btn btn-save">💾 Lưu LocalStorage</button>
+      <button id="btnHome" class="btn btn-add">🏠 Home</button>
+    </div>
+
+  </main>
+
+  <script src="js/admin.js"></script>
+</body>
+</html>

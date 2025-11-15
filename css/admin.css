@@ -1,0 +1,97 @@
+body {
+  font-family: "Segoe UI", sans-serif;
+  background: #f9f9f9;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  background: #8b0000;
+  color: #fff;
+  padding: 15px;
+  text-align: center;
+  position: relative;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 1.8em;
+}
+
+header button {
+  position: absolute;
+  right: 20px;
+  top: 15px;
+}
+
+.container {
+  padding: 20px;
+}
+
+.media-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.media-box {
+  background: #fff;
+  padding: 10px;
+  flex: 1;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+.media-box img {
+  max-width: 27%;
+  margin-top: 5px;
+  border-radius: 4px;
+}
+
+.toolbar {
+  margin-top: 15px;
+  background: #fff;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.btn {
+  border: none;
+  padding: 8px 14px;
+  margin: 4px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-add { background: #4caf50; color: white; }
+.btn-save { background: #2196f3; color: white; }
+.btn-del { background: #f44336; color: white; }
+.btn-info { background: #ffc107; }
+
+.form-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 6px 0;
+}
+
+.form-group label {
+  width: 150px;
+  text-align: right;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  flex: 1;
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.footer-actions {
+  margin-top: 20px;
+  text-align: center;
+}
