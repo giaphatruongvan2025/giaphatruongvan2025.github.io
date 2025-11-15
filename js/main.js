@@ -222,7 +222,7 @@ document.getElementById("btnAdmin").onclick = () => {
 };
 
 /* ==================== CHATBOX AI OPENROUTER ==================== */
-const API_KEY = "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"; // Thay bằng key của bạn
+const API_KEY = "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"; // Thay bằng key của bạn
 const API_URL = "https://openrouter.ai/api/v1/chat/completions";
 const REFERER_DOMAIN = "https://giaphatruongvan2025.github.io";
 
