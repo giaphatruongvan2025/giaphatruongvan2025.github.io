@@ -182,12 +182,11 @@ function showInfo(p) {
 // AI CHATBOX – OPENROUTER VERSION
 // ===============================
 
-const API_KEY = "YOUR_OPENROUTER_KEY_HERE";
+const API_KEY = "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";
 const API_URL = "https://openrouter.ai/api/v1/chat/completions";
 
 // DOMAIN bắt buộc phải khớp với OpenRouter dashboard
-const REFERER_DOMAIN = "https://your-domain-here.com";
-
+const REFERER_DOMAIN = "https://giaphatruongvan2025.github.io";
 // Hàm gửi tin nhắn
 async function sendAIMessage(userMessage) {
     try {
@@ -202,7 +201,7 @@ async function sendAIMessage(userMessage) {
                 "X-Title": "Gia Pha AI Chatbox"
             },
             body: JSON.stringify({
-                model: "gpt-3.5-turbo",   // hoặc "meta-llama/llama-3-70b-instruct"
+                model: "openai/gpt-4.1-mini",   // hoặc "meta-llama/llama-3-70b-instruct"
                 messages: [
                     {
                         role: "system",
