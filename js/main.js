@@ -177,3 +177,81 @@ function showInfo(p) {
         <p>${p.parent || "Không có dữ liệu"}</p>
     `;
 }
+
+// ===============================
+// AI CHATBOX – OPENROUTER VERSION
+// ===============================
+
+const API_KEY = "YOUR_OPENROUTER_KEY_HERE";
+const API_URL = "https://openrouter.ai/api/v1/chat/completions";
+
+// DOMAIN bắt buộc phải khớp với OpenRouter dashboard
+const REFERER_DOMAIN = "https://your-domain-here.com";
+
+// Hàm gửi tin nhắn
+async function sendAIMessage(userMessage) {
+    try {
+        const response = await fetch(API_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${API_KEY}`,
+                
+                // 2 dòng này bắt buộc – nếu thiếu → 401 ngay
+                "HTTP-Referer": REFERER_DOMAIN,
+                "X-Title": "Gia Pha AI Chatbox"
+            },
+            body: JSON.stringify({
+                model: "gpt-3.5-turbo",   // hoặc "meta-llama/llama-3-70b-instruct"
+                messages: [
+                    {
+                        role: "system",
+                        content: "Bạn là trợ lý AI của trang Gia Phả, trả lời ngắn gọn, dễ hiểu."
+                    },
+                    {
+                        role: "user",
+                        content: userMessage
+                    }
+                ]
+            })
+        });
+
+        if (!response.ok) {
+            console.error("❌ Lỗi API:", response.status, await response.text());
+            return "Xin lỗi, AI đang gặp sự cố.";
+        }
+
+        const result = await response.json();
+        return result.choices?.[0]?.message?.content || "Không có phản hồi.";
+
+    } catch (error) {
+        console.error("❌ ERROR:", error);
+        return "Không thể kết nối AI.";
+    }
+}
+
+
+// ===============================
+// Gắn vào giao diện chatbox
+// ===============================
+
+document.getElementById("sendBtn").addEventListener("click", async () => {
+    const input = document.getElementById("chatInput");
+    const msg = input.value.trim();
+    if (!msg) return;
+
+    addMessageToUI("Bạn", msg);
+    input.value = "";
+
+    const aiReply = await sendAIMessage(msg);
+    addMessageToUI("AI", aiReply);
+});
+
+function addMessageToUI(sender, text) {
+    const chatBox = document.getElementById("chatBox");
+    const div = document.createElement("div");
+    div.className = "chat-message";
+    div.innerHTML = `<b>${sender}:</b> ${text}`;
+    chatBox.appendChild(div);
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
