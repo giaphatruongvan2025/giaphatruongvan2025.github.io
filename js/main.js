@@ -1,14 +1,13 @@
-console.log("🌳 Showtime v3.9 Dynamic Tree loaded");
-
 // ==================== CLEAN OLD LOCALSTORAGE ====================
 if (localStorage.getItem("giaPhaData")) {
     console.log("🧹 Xóa localStorage cũ để tránh cache media/clip cũ");
     localStorage.removeItem("giaPhaData");
 }
 
+console.log("🌳 Showtime v3.8 Dynamic Tree loaded");
+
 // ==================== LOAD DATA TỪ JSON ====================
-// Thêm query string timestamp để tránh cache GitHub Pages / browser
-fetch("data/genealogy.json?" + Date.now())
+fetch("data/genealogy.json")
   .then(res => res.json())
   .then(store => {
       localStorage.setItem("giaPhaData", JSON.stringify(store));
@@ -25,17 +24,9 @@ function initApp(store) {
     if (!store.people) store = { people: [], adminPass: "1234" };
     const people = store.people || [];
 
-    // ==================== MEDIA ====================
-    const eventImg = document.getElementById("eventImageDisplay");
-    const youtubeFrame = document.getElementById("youtubeDisplay");
-
-    if (store.eventImage) {
-        eventImg.src = store.eventImage + "?ts=" + Date.now();
-    } else eventImg.src = "";
-
-    if (store.youtubeLink) {
-        youtubeFrame.src = store.youtubeLink + "?ts=" + Date.now();
-    } else youtubeFrame.src = "";
+    // === EVENT IMAGE & YOUTUBE ===
+    if (store.eventImage) document.getElementById("eventImageDisplay").src = store.eventImage;
+    if (store.youtubeLink) document.getElementById("youtubeDisplay").src = store.youtubeLink;
 
     // ==================== DROPDOWNS ====================
     const chiSelect = document.getElementById("chiSelect");
@@ -70,7 +61,7 @@ function initApp(store) {
         }
 
         box.innerHTML = `
-            ${p.anhCaNhan ? `<img src="${p.anhCaNhan}?ts=${Date.now()}" style="max-width:120px;border-radius:8px;float:right;margin-left:10px;">` : ""}
+            ${p.anhCaNhan ? `<img src="${p.anhCaNhan}" style="max-width:120px;border-radius:8px;float:right;margin-left:10px;">` : ""}
             <h3>${p.fullName}</h3>
             <p><strong>Thường gọi:</strong> ${p.nickname || ""}</p>
             <p><strong>Chi:</strong> ${p.chi}</p>
@@ -107,7 +98,7 @@ function initApp(store) {
         drawTree(p.fullName);
     };
 
-    // ==================== TREE ====================
+    // ============================ TREE ============================
     function resetChildren() {
         people.forEach(p => p.children = []);
     }
@@ -128,13 +119,13 @@ function initApp(store) {
         return people.filter(p => p.parent === nodeName).map(child => ({ ...child, children: [] }));
     }
 
-    // Chỉ show 1 node khi load, tất cả các node xếp chồng
     function drawTree(centerName = null) {
         resetChildren();
-        if (!centerName) {
-            // Nếu chưa chọn ai → show 1 node chính giữa
-            renderTree({ name: "Gia phả", children: [] });
-            return;
+        if (!centerName) { 
+            // Load collapsed 1 node đầu khi load web
+            const treeData = { name: "Gia phả", children: [] };
+            renderTree(treeData); 
+            return; 
         }
 
         const center = people.find(p => p.fullName === centerName);
@@ -148,9 +139,7 @@ function initApp(store) {
         const centerNode = JSON.parse(JSON.stringify(center));
         centerNode.children = getChildren(center.fullName);
 
-        const treeData = parent
-            ? { name: "Gia phả", children: [{ ...parent, children: [centerNode] }] }
-            : { name: "Gia phả", children: [centerNode] };
+        let treeData = parent ? { name: "Gia phả", children: [{ ...parent, children: [centerNode] }] } : { name: "Gia phả", children: [centerNode] };
 
         renderTree(treeData);
         showInfo(center);
@@ -195,7 +184,7 @@ function initApp(store) {
 
         node.filter(d => d.data.anhCaNhan)
             .append("image")
-            .attr("xlink:href", d => d.data.anhCaNhan + "?ts=" + Date.now())
+            .attr("xlink:href", d => d.data.anhCaNhan)
             .attr("x", -100)
             .attr("y", -25)
             .attr("width", 50)
@@ -256,5 +245,24 @@ function initApp(store) {
 
     // ==================== INIT ====================
     refreshDropdowns();
-    drawTree(null);
+    drawTree(null); // collapsed tree 1 node
+
+    // ==================== AUTO REFRESH JSON MỚI MỖI 10s ====================
+    setInterval(async () => {
+        try {
+            const res = await fetch("data/genealogy.json?" + Date.now());
+            const newStore = await res.json();
+            localStorage.setItem("giaPhaData", JSON.stringify(newStore));
+
+            // update media
+            if (newStore.eventImage) document.getElementById("eventImageDisplay").src = newStore.eventImage;
+            if (newStore.youtubeLink) document.getElementById("youtubeDisplay").src = newStore.youtubeLink;
+
+            // update node ảnh + info panel nếu có người đang chọn
+            const ten = document.getElementById("tenSelect").value;
+            const p = newStore.people.find(x => x.fullName === ten);
+            if (p) showInfo(p);
+
+        } catch (err) { console.warn("Không thể refresh JSON mới:", err); }
+    }, 10000);
 }
