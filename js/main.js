@@ -1,4 +1,4 @@
-console.log("🌳 Showtime v3.8 Dynamic Tree loaded");
+console.log("🌳 Showtime v3.9 Dynamic Tree loaded");
 
 // ==================== CLEAN OLD LOCALSTORAGE ====================
 if (localStorage.getItem("giaPhaData")) {
@@ -6,8 +6,8 @@ if (localStorage.getItem("giaPhaData")) {
     localStorage.removeItem("giaPhaData");
 }
 
-// ==================== LOAD DATA TỪ JSON ====================
-fetch("data/genealogy.json?" + Date.now()) // + timestamp để không cache
+// ==================== LOAD DATA TỪ JSON (CACHE-BUSTING) ====================
+fetch(`data/genealogy.json?t=${Date.now()}`)
   .then(res => res.json())
   .then(store => {
       localStorage.setItem("giaPhaData", JSON.stringify(store));
@@ -24,12 +24,15 @@ function initApp(store) {
     if (!store.people) store = { people: [], adminPass: "1234" };
     const people = store.people || [];
 
-    // === EVENT IMAGE & YOUTUBE (thêm timestamp để tránh cache) ===
-    const eventImg = document.getElementById("eventImageDisplay");
-    const youtubeFrame = document.getElementById("youtubeDisplay");
+    // ==================== MEDIA: ẢNH SỰ KIỆN + YOUTUBE ====================
+    function updateMedia() {
+        if (store.eventImage) document.getElementById("eventImageDisplay").src = store.eventImage;
+        else document.getElementById("eventImageDisplay").src = "";
 
-    if (store.eventImage) eventImg.src = store.eventImage + "?ts=" + Date.now();
-    if (store.youtubeLink) youtubeFrame.src = store.youtubeLink + "&t=" + Date.now();
+        if (store.youtubeLink) document.getElementById("youtubeDisplay").src = store.youtubeLink;
+        else document.getElementById("youtubeDisplay").src = "";
+    }
+    updateMedia();
 
     // ==================== DROPDOWNS ====================
     const chiSelect = document.getElementById("chiSelect");
@@ -55,7 +58,7 @@ function initApp(store) {
 
     chiSelect.onchange = doiSelect.onchange = refreshDropdowns;
 
-    // ==================== INFO PANEL ====================
+    // ==================== INFO PANEL + NODE ẢNH CÁ NHÂN ====================
     function showInfo(p) {
         const box = document.getElementById("infoDetail");
         if (!p) {
@@ -64,7 +67,7 @@ function initApp(store) {
         }
 
         box.innerHTML = `
-            ${p.anhCaNhan ? `<img src="${p.anhCaNhan}?ts=${Date.now()}" style="max-width:120px;border-radius:8px;float:right;margin-left:10px;">` : ""}
+            ${p.anhCaNhan ? `<img src="${p.anhCaNhan}" style="max-width:120px;border-radius:8px;float:right;margin-left:10px;">` : ""}
             <h3>${p.fullName}</h3>
             <p><strong>Thường gọi:</strong> ${p.nickname || ""}</p>
             <p><strong>Chi:</strong> ${p.chi}</p>
@@ -101,7 +104,7 @@ function initApp(store) {
         drawTree(p.fullName);
     };
 
-    // ============================ TREE ============================
+    // ==================== TREE ====================
     function resetChildren() {
         people.forEach(p => p.children = []);
     }
@@ -124,7 +127,15 @@ function initApp(store) {
 
     function drawTree(centerName = null) {
         resetChildren();
-        if (!centerName) { renderFullTree(); return; }
+
+        let treeData;
+
+        if (!centerName) {
+            // Khi load, chỉ show 1 node ở giữa (ẩn tất cả các node con)
+            treeData = { name: "Gia phả", children: [{ name: "Nhấn chọn 1 người", children: [] }] };
+            renderTree(treeData);
+            return;
+        }
 
         const center = people.find(p => p.fullName === centerName);
         if (!center) { renderFullTree(); return; }
@@ -137,7 +148,9 @@ function initApp(store) {
         const centerNode = JSON.parse(JSON.stringify(center));
         centerNode.children = getChildren(center.fullName);
 
-        let treeData = parent ? { name: "Gia phả", children: [{ ...parent, children: [centerNode] }] } : { name: "Gia phả", children: [centerNode] };
+        treeData = parent
+            ? { name: "Gia phả", children: [{ ...parent, children: [centerNode] }] }
+            : { name: "Gia phả", children: [centerNode] };
 
         renderTree(treeData);
         showInfo(center);
@@ -154,6 +167,7 @@ function initApp(store) {
         const treeLayout = d3.tree().size([height, width - 200]);
         treeLayout(root);
 
+        // ==================== LINKS ====================
         svg.append("g")
             .selectAll("path")
             .data(root.links())
@@ -163,6 +177,7 @@ function initApp(store) {
             .attr("stroke-width", 2)
             .attr("d", d3.linkHorizontal().x(d => d.y).y(d => d.x));
 
+        // ==================== NODES ====================
         const node = svg.append("g")
             .selectAll("g")
             .data(root.descendants())
@@ -180,10 +195,9 @@ function initApp(store) {
             .attr("fill", "#fff4cc")
             .attr("stroke", "#8B0000");
 
-        // ================= ADD TIMESTAMP CHO ẢNH NODE =================
         node.filter(d => d.data.anhCaNhan)
             .append("image")
-            .attr("xlink:href", d => d.data.anhCaNhan + "?ts=" + Date.now())
+            .attr("xlink:href", d => d.data.anhCaNhan)
             .attr("x", -100)
             .attr("y", -25)
             .attr("width", 50)
@@ -244,5 +258,5 @@ function initApp(store) {
 
     // ==================== INIT ====================
     refreshDropdowns();
-    renderFullTree();
+    drawTree(null);
 }
