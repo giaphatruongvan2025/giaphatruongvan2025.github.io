@@ -93,11 +93,8 @@ function initApp(store) {
     };
 
     // ============================ TREE ============================
-    function resetChildren() {
-        people.forEach(p => p.children = []);
-    }
+    function resetChildren() { people.forEach(p => p.children = []); }
 
-    // ===== COLLAPSE TREE =====
     function collapseTree(d) {
         if(d.children) {
             d._children = d.children;
@@ -117,15 +114,13 @@ function initApp(store) {
         });
 
         const treeData = { name: "Gia phả", children: roots };
-        // collapse tất cả node con để load chỉ 1 node
-        treeData.children.forEach(collapseTree);
+        treeData.children.forEach(collapseTree); // collapsed load
 
         renderTree(treeData);
+        centerTree(); // center after render
     }
 
-    function getChildren(nodeName) {
-        return people.filter(p => p.parent === nodeName).map(child => ({ ...child, children: [] }));
-    }
+    function getChildren(nodeName) { return people.filter(p => p.parent === nodeName).map(child => ({ ...child, children: [] })); }
 
     function drawTree(centerName = null) {
         resetChildren();
@@ -137,16 +132,17 @@ function initApp(store) {
         const byName = Object.fromEntries(people.map(p => [p.fullName, p]));
 
         let parent = null;
-        if (center.parent && byName[center.parent]) parent = JSON.parse(JSON.stringify(byName[center.parent]));
+        if(center.parent && byName[center.parent]) parent = JSON.parse(JSON.stringify(byName[center.parent]));
 
         const centerNode = JSON.parse(JSON.stringify(center));
-        centerNode.children = getChildren(center.fullName); // chỉ expand 1 level khi click
+        centerNode.children = getChildren(center.fullName); // chỉ 1 level khi click
 
-        let treeData = parent ? { name: "Gia phả", children: [{ ...parent, children: [centerNode] }] }
-                              : { name: "Gia phả", children: [centerNode] };
+        const treeData = parent ? { name: "Gia phả", children: [{ ...parent, children: [centerNode] }] } 
+                                : { name: "Gia phả", children: [centerNode] };
 
         renderTree(treeData);
         showInfo(center);
+        centerTree();
     }
 
     function renderTree(treeData) {
@@ -175,7 +171,7 @@ function initApp(store) {
             .join("g")
             .attr("class", "node")
             .attr("transform", d => `translate(${d.y},${d.x})`)
-            .on("click", (e, d) => { if (d.data.fullName) { drawTree(d.data.fullName); showInfo(d.data); } });
+            .on("click", (e,d)=>{ if(d.data.fullName){ drawTree(d.data.fullName); showInfo(d.data); } });
 
         node.append("rect")
             .attr("width", 210)
@@ -189,81 +185,85 @@ function initApp(store) {
         node.filter(d => d.data.anhCaNhan)
             .append("image")
             .attr("xlink:href", d => d.data.anhCaNhan)
-            .attr("x", -100)
-            .attr("y", -25)
-            .attr("width", 50)
-            .attr("height", 50)
-            .attr("clip-path", "circle(25px at 25px 25px)");
+            .attr("x",-100).attr("y",-25)
+            .attr("width",50).attr("height",50)
+            .attr("clip-path","circle(25px at 25px 25px)");
 
         node.append("text")
             .attr("x", -40)
             .attr("dy", 5)
-            .attr("text-anchor", "start")
-            .text(d => d.data.fullName || "(Chưa nhập)");
+            .attr("text-anchor","start")
+            .text(d=>d.data.fullName||"(Chưa nhập)");
     }
 
     // ==================== ZOOM ====================
     let zoom = 1;
-    zoomIn.onclick = () => { zoom += .1; genealogyTree.style.transform = `scale(${zoom})`; };
-    zoomOut.onclick = () => { zoom = Math.max(.5, zoom - .1); genealogyTree.style.transform = `scale(${zoom})`; };
+    zoomIn.onclick = ()=>{ zoom+=0.1; genealogyTree.style.transform=`scale(${zoom})`; };
+    zoomOut.onclick = ()=>{ zoom=Math.max(0.5,zoom-0.1); genealogyTree.style.transform=`scale(${zoom})`; };
 
     // ==================== TOÀN BỘ ====================
-    document.getElementById("allBtn").onclick = () => { drawTree(null); };
+    document.getElementById("allBtn").onclick = ()=>{ drawTree(null); };
 
     // ==================== CHATBOX ====================
-    const chatboxBody = document.getElementById("chatbox-body");
-    const chatInput = document.getElementById("chatInput");
-    const chatSend = document.getElementById("chatSend");
-    const chatboxToggle = document.getElementById("chatbox-toggle");
-    const apiKey = "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";
+    const chatboxBody=document.getElementById("chatbox-body");
+    const chatInput=document.getElementById("chatInput");
+    const chatSend=document.getElementById("chatSend");
+    const chatboxToggle=document.getElementById("chatbox-toggle");
+    const apiKey="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";
 
-    async function askAI(q) {
-        try {
-            const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-                method: "POST",
-                headers: { "Authorization": `Bearer ${apiKey}`, "Content-Type": "application/json" },
-                body: JSON.stringify({ model: "mistralai/mistral-small-3.1-24b-instruct:free", messages: [{ role: "system", content: "Bạn là trợ lý gia phả, trả lời ngắn gọn, dễ hiểu." }, { role: "user", content: q }] })
+    async function askAI(q){
+        try{
+            const res=await fetch("https://openrouter.ai/api/v1/chat/completions",{
+                method:"POST",
+                headers:{"Authorization":`Bearer ${apiKey}`,"Content-Type":"application/json"},
+                body:JSON.stringify({model:"mistralai/mistral-small-3.1-24b-instruct:free",messages:[{role:"system",content:"Bạn là trợ lý gia phả, trả lời ngắn gọn, dễ hiểu."},{role:"user",content:q}]})
             });
-            const data = await res.json();
+            const data=await res.json();
             return data.choices?.[0]?.message?.content || "Không có phản hồi.";
-        } catch (err) { console.error("Chatbox AI Error:", err); return "Không kết nối AI."; }
+        }catch(err){console.error("Chatbox AI Error:",err); return "Không kết nối AI.";}
     }
 
-    chatSend.onclick = async () => {
-        const text = chatInput.value.trim(); if (!text) return;
-        chatboxBody.innerHTML += `<div><b>Bạn:</b> ${text}</div>`;
-        const reply = await askAI(text);
-        chatboxBody.innerHTML += `<div><em>AI:</em> ${reply}</div>`;
-        chatboxBody.scrollTop = chatboxBody.scrollHeight;
-        chatInput.value = "";
+    chatSend.onclick=async ()=>{
+        const text=chatInput.value.trim(); if(!text) return;
+        chatboxBody.innerHTML+=`<div><b>Bạn:</b> ${text}</div>`;
+        const reply=await askAI(text);
+        chatboxBody.innerHTML+=`<div><em>AI:</em> ${reply}</div>`;
+        chatboxBody.scrollTop=chatboxBody.scrollHeight;
+        chatInput.value="";
     };
 
-    chatboxToggle.onclick = () => { document.getElementById("chatbox").classList.toggle("minimized"); };
+    chatboxToggle.onclick=()=>{ document.getElementById("chatbox").classList.toggle("minimized"); };
 
     // ==================== ADMIN PASS ====================
-    btnAdmin.onclick = () => {
-        const pass = prompt("🔑 Nhập mật khẩu quản trị:");
-        if (pass === store.adminPass || pass === "1234") window.location.href = "admin.html";
+    btnAdmin.onclick=()=>{
+        const pass=prompt("🔑 Nhập mật khẩu quản trị:");
+        if(pass===store.adminPass || pass==="1234") window.location.href="admin.html";
         else alert("❌ Sai mật khẩu!");
     };
 
-    // ==================== AUTO CENTER TREE + STORAGE LISTENER =====
-    function centerTree() {
-        const treeContainer = document.querySelector(".tree-panel");
-        const svg = document.getElementById("genealogyTree");
+    // ==================== CENTER TREE + STORAGE LISTENER ====================
+    function centerTree(){
+        const treeContainer=document.querySelector(".tree-panel");
+        const svg=document.getElementById("genealogyTree");
         if(!treeContainer || !svg) return;
         setTimeout(()=>{
-            treeContainer.scrollLeft = (svg.getBoundingClientRect().width - treeContainer.clientWidth)/2;
-        }, 100);
+            treeContainer.scrollLeft=(svg.getBoundingClientRect().width - treeContainer.clientWidth)/2;
+            treeContainer.scrollTop=(svg.getBoundingClientRect().height - treeContainer.clientHeight)/2;
+        },100);
     }
+
     window.addEventListener("load", centerTree);
     window.addEventListener("resize", centerTree);
 
-    window.addEventListener("storage", (e)=>{
-        if(e.key === "giaPhaData"){
-            const updated = JSON.parse(e.newValue || "{}");
-            if(updated.eventImage) document.getElementById("eventImageDisplay").src = updated.eventImage;
-            if(updated.youtubeLink) document.getElementById("youtubeDisplay").src = updated.youtubeLink;
+    window.addEventListener("storage",(e)=>{
+        if(e.key==="giaPhaData"){
+            const updated=JSON.parse(e.newValue||"{}");
+            if(updated.eventImage) document.getElementById("eventImageDisplay").src=updated.eventImage;
+            if(updated.youtubeLink) document.getElementById("youtubeDisplay").src=updated.youtubeLink;
+            const selectedName=tenSelect.value;
+            const p=(updated.people||[]).find(x=>x.fullName===selectedName);
+            if(p) showInfo(p);
+            drawTree(selectedName);
         }
     });
 
