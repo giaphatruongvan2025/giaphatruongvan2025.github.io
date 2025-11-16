@@ -347,3 +347,13 @@ html, body {
     margin: 10px;
   }
 }
+/* ==== FIX TREE CHE 1/2 + NODE IMAGE + COLLAPSED TREE LOAD ==== */
+.tree-panel {
+    overflow: auto;  /* giữ nguyên */
+    text-align: center;  /* căn giữa tree */
+}
+
+.node image {
+    clip-path: circle(25px at 25px 25px);
+    width: 50px; height: 50px;  /* đảm bảo vừa rect */
+}
