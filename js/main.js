@@ -1,3 +1,9 @@
+// ==================== CLEAN OLD LOCALSTORAGE ====================
+if(localStorage.getItem("giaPhaData")){
+    console.log("🧹 Xóa localStorage cũ để tránh cache media cũ");
+    localStorage.removeItem("giaPhaData");
+}
+
 console.log("🌳 Showtime v3.8_fixed Dynamic Tree loaded");
 
 // ==================== LOAD DATA TỪ JSON ====================
