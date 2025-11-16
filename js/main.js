@@ -1,4 +1,4 @@
-console.log("🌳 Showtime v3.8 Dynamic Tree loaded");
+console.log("🌳 Showtime v3.8_fixed Dynamic Tree loaded");
 
 // ==================== LOAD DATA TỪ JSON ====================
 fetch("data/genealogy.json")
@@ -97,6 +97,15 @@ function initApp(store) {
         people.forEach(p => p.children = []);
     }
 
+    // ===== COLLAPSE TREE =====
+    function collapseTree(d) {
+        if(d.children) {
+            d._children = d.children;
+            d._children.forEach(collapseTree);
+            d.children = null;
+        }
+    }
+
     function renderFullTree() {
         resetChildren();
         const byName = Object.fromEntries(people.map(p => [p.fullName, p]));
@@ -106,7 +115,12 @@ function initApp(store) {
             if (parent) parent.children.push(p);
             else roots.push(p);
         });
-        renderTree({ name: "Gia phả", children: roots });
+
+        const treeData = { name: "Gia phả", children: roots };
+        // collapse tất cả node con để load chỉ 1 node
+        treeData.children.forEach(collapseTree);
+
+        renderTree(treeData);
     }
 
     function getChildren(nodeName) {
@@ -126,9 +140,10 @@ function initApp(store) {
         if (center.parent && byName[center.parent]) parent = JSON.parse(JSON.stringify(byName[center.parent]));
 
         const centerNode = JSON.parse(JSON.stringify(center));
-        centerNode.children = getChildren(center.fullName);
+        centerNode.children = getChildren(center.fullName); // chỉ expand 1 level khi click
 
-        let treeData = parent ? { name: "Gia phả", children: [{ ...parent, children: [centerNode] }] } : { name: "Gia phả", children: [centerNode] };
+        let treeData = parent ? { name: "Gia phả", children: [{ ...parent, children: [centerNode] }] }
+                              : { name: "Gia phả", children: [centerNode] };
 
         renderTree(treeData);
         showInfo(center);
@@ -231,6 +246,26 @@ function initApp(store) {
         if (pass === store.adminPass || pass === "1234") window.location.href = "admin.html";
         else alert("❌ Sai mật khẩu!");
     };
+
+    // ==================== AUTO CENTER TREE + STORAGE LISTENER =====
+    function centerTree() {
+        const treeContainer = document.querySelector(".tree-panel");
+        const svg = document.getElementById("genealogyTree");
+        if(!treeContainer || !svg) return;
+        setTimeout(()=>{
+            treeContainer.scrollLeft = (svg.getBoundingClientRect().width - treeContainer.clientWidth)/2;
+        }, 100);
+    }
+    window.addEventListener("load", centerTree);
+    window.addEventListener("resize", centerTree);
+
+    window.addEventListener("storage", (e)=>{
+        if(e.key === "giaPhaData"){
+            const updated = JSON.parse(e.newValue || "{}");
+            if(updated.eventImage) document.getElementById("eventImageDisplay").src = updated.eventImage;
+            if(updated.youtubeLink) document.getElementById("youtubeDisplay").src = updated.youtubeLink;
+        }
+    });
 
     // ==================== INIT ====================
     refreshDropdowns();
